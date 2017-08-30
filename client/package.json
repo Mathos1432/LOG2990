@@ -23,6 +23,8 @@
     "@angular/router": "^4.2.4",
     "core-js": "^2.4.1",
     "rxjs": "^5.4.2",
+    "stats.js": "^0.17.0",
+    "three": "~0.84.0",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
@@ -32,6 +34,8 @@
     "@types/jasmine": "~2.5.53",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~6.0.60",
+    "@types/three": "~0.84.20",
+    "@types/stats.js": "^0.16.1",
     "codelyzer": "~3.1.1",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
