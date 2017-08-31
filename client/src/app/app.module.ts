@@ -1,10 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpModule }    from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { CubeComponent } from './cube/cube.component';
 
 import {RenderService} from "./cube/render.service"
+import {BasicService} from "./basic.service"
+
 
 @NgModule({
   declarations: [
@@ -12,9 +15,13 @@ import {RenderService} from "./cube/render.service"
     CubeComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpModule
   ],
-  providers: [RenderService],
+  providers: [
+    RenderService,
+    BasicService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

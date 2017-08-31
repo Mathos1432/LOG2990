@@ -1,4 +1,5 @@
 import * as express from 'express';
+import {Message} from "../../../commun/communication/message"
 
 module Route {
 
@@ -8,7 +9,10 @@ module Route {
         }
 
         public index(req: express.Request, res: express.Response, next: express.NextFunction) {
-            res.send('Hello world');
+            var message = new Message()
+            message.title = "Hello";
+            message.body = "World"
+            res.send(JSON.stringify(message));
         }
     }
 }

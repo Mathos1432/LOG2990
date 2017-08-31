@@ -78,7 +78,7 @@ export class Application {
     const index: indexRoute.Index = new indexRoute.Index();
 
     //home page
-    router.get('/', index.index.bind(index.index));
+    router.get('/basic', index.index.bind(index.index));
 
     //use router middleware
     this.app.use(router);

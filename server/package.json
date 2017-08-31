@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "tsc && concurrently --kill-others \"tsc -w \" \"nodemon out/www.js\" ",
+    "start": "tsc && concurrently --kill-others \"tsc -w \" \"nodemon out/server/app/www.js\" ",
     "lint": "tslint app/**/*.ts app/*.ts --force -t verbose",
     "test": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
     "test-once": "tsc && karma start karma.conf.js --single-run || npm run-script coverage",
