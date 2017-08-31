@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import {AppModule} from '../app.module';
 import { CubeComponent } from './cube.component';
 
 describe('CubeComponent', () => {
@@ -8,7 +9,9 @@ describe('CubeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CubeComponent ]
+      imports: [
+        AppModule
+      ]
     })
     .compileComponents();
   }));
