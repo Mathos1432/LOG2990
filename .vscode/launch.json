@@ -2,9 +2,15 @@
     "version": "0.2.0",
     "configurations": [
       {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach to Process",
+        "processId": "${command:PickProcess}"
+      },
+      {
         "type": "chrome",
         "request": "launch",
-        "name": "Launch Chrome",
+        "name": "Debug client",
         "url": "http://localhost:4200",
         "webRoot": "${workspaceRoot}",
         "sourceMaps": true,
