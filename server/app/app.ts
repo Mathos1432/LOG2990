@@ -41,10 +41,10 @@ export class Application {
     // Application instantiation
     this.app = express();
 
-    //configure this.application
+    // configure this.application
     this.config();
 
-    //configure routes
+    // configure routes
     this.routes();
   }
 
@@ -74,18 +74,18 @@ export class Application {
     let router: express.Router;
     router = express.Router();
 
-    //create routes
+    // create routes
     const index: indexRoute.Index = new indexRoute.Index();
 
-    //home page
+    // home page
     router.get('/basic', index.index.bind(index.index));
 
-    //use router middleware
+    // use router middleware
     this.app.use(router);
 
     // Gestion des erreurs
     this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-        let err = new Error('Not Found');
+        const err = new Error('Not Found');
         next(err);
     });
 

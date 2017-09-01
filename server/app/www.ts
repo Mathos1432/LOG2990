@@ -15,7 +15,7 @@ const appPort = normalizePort(process.env.PORT || '3000');
 application.app.set('port', appPort);
 
 // Création du serveur HTTP.
-let server = http.createServer(application.app);
+const server = http.createServer(application.app);
 
 /**
  *  Écoute du traffic sur le port configuré.
@@ -31,10 +31,14 @@ server.on('listening', onListening);
  * @returns Le port normalisé.
  */
 function normalizePort(val: number|string): number|string|boolean {
-  let port: number = (typeof val === 'string') ? parseInt(val, 10) : val;
-  if  (isNaN(port)) { return val; }
-  else if (port >= 0) { return port; }
-  else { return false; }
+  const port: number = (typeof val === 'string') ? parseInt(val, 10) : val;
+  if  (isNaN(port)) {
+    return val;
+  } else if (port >= 0) {
+    return port;
+  } else {
+    return false;
+  }
 }
 
 /**
@@ -43,8 +47,8 @@ function normalizePort(val: number|string): number|string|boolean {
  * @param error Erreur interceptée par le serveur.
  */
 function onError(error: NodeJS.ErrnoException): void {
-  if (error.syscall !== 'listen') throw error;
-  let bind = (typeof appPort === 'string') ? 'Pipe ' + appPort : 'Port ' + appPort;
+  if (error.syscall !== 'listen') { throw error; }
+  const bind = (typeof appPort === 'string') ? 'Pipe ' + appPort : 'Port ' + appPort;
   switch (error.code) {
     case 'EACCES':
       console.error(`${bind} requires elevated privileges`);
@@ -63,7 +67,7 @@ function onError(error: NodeJS.ErrnoException): void {
  * Se produit lorsque le serveur se met à écouter sur le port.
  */
 function onListening(): void {
-  let addr = server.address();
-  let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
+  const addr = server.address();
+  const bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
   console.log(`Listening on ${bind}`);
 }

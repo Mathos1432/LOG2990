@@ -28,7 +28,7 @@
       true,
       140
     ],
-    "member-access": false,
+    "member-access": true,
     "member-ordering": [
       true,
       {
@@ -69,6 +69,7 @@
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
     "no-unused-expression": true,
+    "no-unused-variable": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
@@ -79,6 +80,9 @@
       "check-else",
       "check-whitespace"
     ],
+    "cyclomatic-complexity": [ true, 20],
+    "max-classes-per-file": [true, 2],
+    "no-unsafe-finally": true,
     "prefer-const": true,
     "quotemark": [
       true,
@@ -105,7 +109,7 @@
     ],
     "typeof-compare": true,
     "unified-signatures": true,
-    "variable-name": false,
+    "variable-name": true,
     "whitespace": [
       true,
       "check-branch",
@@ -114,6 +118,7 @@
       "check-separator",
       "check-type"
     ],
+
     "directive-selector": [
       true,
       "attribute",
@@ -137,6 +142,10 @@
     "directive-class-suffix": true,
     "no-access-missing-member": true,
     "templates-use-public": true,
-    "invoke-injectable": true
+    "invoke-injectable": true,
+
+    // rules added by Dylan
+    "no-sparse-arrays": true,
+    "no-irregular-whitespace": true
   }
 }

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
-import Stats = require("stats.js")
+import Stats = require('stats.js');
 
 @Injectable()
 export class RenderService {
 
-  private container : HTMLDivElement;
+  private container: HTMLDivElement;
 
   private camera: THREE.PerspectiveCamera;
 
@@ -17,17 +17,17 @@ export class RenderService {
 
   private scene: THREE.Scene;
 
-  private cameraZ: number = 400;
+  private cameraZ = 400;
 
-  private fieldOfView: number = 70;
+  private fieldOfView = 70;
 
-  private nearClippingPane: number = 1;
+  private nearClippingPane = 1;
 
-  private farClippingPane: number = 1000;
+  private farClippingPane = 1000;
 
-  public rotationSpeedX: number = 0.005;
+  public rotationSpeedX = 0.005;
 
-  public rotationSpeedY: number = 0.01;
+  public rotationSpeedY = 0.01;
 
   private animateCube() {
     this.cube.rotation.x += this.rotationSpeedX;
@@ -35,15 +35,15 @@ export class RenderService {
   }
 
   private createCube() {
-    var geometry = new THREE.BoxGeometry(200, 200, 200);
+    const geometry = new THREE.BoxGeometry(200, 200, 200);
 
-    for (var i = 0; i < geometry.faces.length; i += 2) {
-      var hex = Math.random() * 0xffffff;
+    for (let i = 0; i < geometry.faces.length; i += 2) {
+      const hex = Math.random() * 0xffffff;
       geometry.faces[i].color.setHex(hex);
       geometry.faces[i + 1].color.setHex(hex);
     }
 
-    var material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors, overdraw: 0.5 });
+    const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors, overdraw: 0.5 });
     this.cube = new THREE.Mesh(geometry, material);
     this.scene.add(this.cube);
   }
@@ -53,7 +53,7 @@ export class RenderService {
     this.scene = new THREE.Scene();
 
     /* Camera */
-    let aspectRatio = this.getAspectRatio();
+    const aspectRatio = this.getAspectRatio();
     this.camera = new THREE.PerspectiveCamera(
       this.fieldOfView,
       aspectRatio,
@@ -81,7 +81,7 @@ export class RenderService {
     this.animateCube();
 
     this.renderer.render(this.scene, this.camera);
-    this.stats.update()
+    this.stats.update();
   }
 
   private initStats() {

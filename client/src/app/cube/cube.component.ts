@@ -21,10 +21,10 @@ export class CubeComponent implements AfterViewInit {
   private containerRef: ElementRef;
 
   @Input()
-  public rotationSpeedX: number = 0.005;
+  public rotationSpeedX = 0.005;
 
   @Input()
-  public rotationSpeedY: number = 0.01;
+  public rotationSpeedY = 0.01;
 
   @HostListener('window:resize', ['$event'])
   public onResize() {
