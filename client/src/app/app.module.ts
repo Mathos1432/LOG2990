@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { CubeComponent } from './cube/cube.component';
+import { GameComponent } from './cube/game.component';
 
 import { RenderService } from './cube/render.service';
 import { BasicService } from './basic.service';
@@ -12,7 +12,7 @@ import { BasicService } from './basic.service';
 @NgModule({
     declarations: [
         AppComponent,
-        CubeComponent
+        GameComponent
     ],
     imports: [
         BrowserModule,

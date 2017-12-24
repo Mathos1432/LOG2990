@@ -1,27 +1,58 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import Stats = require('stats.js');
+import { Vector3, Vector2 } from 'three';
 
 const FAR_CLIPPING_PLANE = 1000;
 const NEAR_CLIPPING_PLANE = 1;
 const FIELD_OF_VIEW = 70;
 const CAMERA_Z = 400;
+const DEFAULT_ROTATION_SPEED = new Vector3(0.005, 0.01, 0);
 
 @Injectable()
 export class RenderService {
-
-    private container: HTMLDivElement;
     private camera: THREE.PerspectiveCamera;
-    private stats: Stats;
+    private container: HTMLDivElement;
     private cube: THREE.Mesh;
     private renderer: THREE.WebGLRenderer;
+    private rotationSpeed: Vector3;
     private scene: THREE.Scene;
-    public rotationSpeedX = 0.005;
-    public rotationSpeedY = 0.01;
+    private stats: Stats;
+
+    constructor() {
+        this.rotationSpeed = DEFAULT_ROTATION_SPEED;
+    }
+
+    public initialize(container: HTMLDivElement, rotationSpeed: Vector3) {
+        if (container) {
+            this.container = container;
+        }
+        
+        if (rotationSpeed) {
+            this.rotationSpeed = rotationSpeed;
+        }
+        
+        this.createScene();
+        this.createCube();
+        this.initStats();
+        this.startRenderingLoop();
+    }
+
+    private initStats() {
+        this.stats = new Stats();
+        this.stats.dom.style.position = 'absolute';
+        this.container.appendChild(this.stats.dom);
+    }
 
     private update() {
-        this.cube.rotation.x += this.rotationSpeedX;
-        this.cube.rotation.y += this.rotationSpeedY;
+        const currentCubeRotation = this.cube.rotation;
+
+        const newRotation = new Vector3(
+            currentCubeRotation.x + this.rotationSpeed.x,
+            currentCubeRotation.y + this.rotationSpeed.y,
+            currentCubeRotation.z + this.rotationSpeed.z);
+
+        this.cube.rotation.setFromVector3(newRotation);
     }
 
     private createCube() {
@@ -39,17 +70,15 @@ export class RenderService {
     }
 
     private createScene() {
-        /* Scene */
         this.scene = new THREE.Scene();
 
-        /* Camera */
-        const aspectRatio = this.getAspectRatio();
         this.camera = new THREE.PerspectiveCamera(
             FIELD_OF_VIEW,
-            aspectRatio,
+            this.getAspectRatio(),
             NEAR_CLIPPING_PLANE,
             FAR_CLIPPING_PLANE
         );
+
         this.camera.position.z = CAMERA_Z;
     }
 
@@ -73,26 +102,9 @@ export class RenderService {
         this.stats.update();
     }
 
-    private initStats() {
-        this.stats = new Stats();
-        this.stats.dom.style.position = 'absolute';
-        this.container.appendChild(this.stats.dom);
-    }
-
     public onResize() {
         this.camera.aspect = this.getAspectRatio();
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    }
-
-    public initialize(container: HTMLDivElement, rotationX: number, rotationY: number) {
-        this.container = container;
-        this.rotationSpeedX = rotationX;
-        this.rotationSpeedY = rotationY;
-
-        this.createScene();
-        this.createCube();
-        this.initStats();
-        this.startRenderingLoop();
     }
 }
