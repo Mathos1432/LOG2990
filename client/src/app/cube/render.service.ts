@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import Stats = require('stats.js');
-import { Vector3, PerspectiveCamera, WebGLRenderer, Scene } from 'three';
+import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { Car } from './car';
 
 const FAR_CLIPPING_PLANE = 1000;
@@ -15,9 +15,6 @@ const RIGHT_KEYCODE = 68;       // d
 
 @Injectable()
 export class RenderService {
-    releasedAccelerator(): any {
-        throw new Error("Method not implemented.");
-    }
     private camera: PerspectiveCamera;
     private container: HTMLDivElement;
     private car: Car;
@@ -93,7 +90,7 @@ export class RenderService {
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
 
-    handleKeyDown(event: KeyboardEvent): void {
+    public handleKeyDown(event: KeyboardEvent): void {
         // TODO: determine behavior when a and d are pressed at the same time.
         switch (event.keyCode) {
             case ACCELERATE_KEYCODE:
@@ -114,7 +111,7 @@ export class RenderService {
         }
     }
 
-    handleKeyUp(event: KeyboardEvent): void {
+    public handleKeyUp(event: KeyboardEvent): void {
         switch (event.keyCode) {
             case ACCELERATE_KEYCODE:
                 this.car.isAcceleratorPressed = false;

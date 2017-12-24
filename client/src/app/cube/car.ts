@@ -1,6 +1,6 @@
-import { Object3D, Vector3, BoxGeometry, Mesh, MeshBasicMaterial, FaceColors, Vector2, Vector, Matrix4 } from "three";
-import { Engine } from "./engine";
-import { DEG_TO_RAD } from "../constants";
+import { Vector3, BoxGeometry, Mesh, MeshBasicMaterial, FaceColors, Matrix4 } from 'three';
+import { Engine } from './engine';
+import { DEG_TO_RAD } from '../constants';
 
 const AERODYNAMIC_DRAG = -0.4;
 const BRAKE_POWER = -10000;
@@ -16,7 +16,6 @@ export class Car {
     private isBraking: boolean;
     private steeringWheelDirection: number;
     private speed: Vector3;
-    private forces: Vector3[];
 
     private get rotation(): Vector3 {
         return this.mesh.rotation.toVector3();
@@ -43,7 +42,7 @@ export class Car {
         }
         const material = new MeshBasicMaterial({ vertexColors: FaceColors, overdraw: 0.5 });
         this.mesh = new Mesh(geometry, material);
-        this.mesh.rotateX(90 * DEG_TO_RAD)
+        this.mesh.rotateX(90 * DEG_TO_RAD);
 
         this.isBraking = false;
         this.steeringWheelDirection = 0;
@@ -86,40 +85,41 @@ export class Car {
         }
 
         const acceleration = this.getAcceleration(forces);
-        let newSpeed = this.getSpeed(acceleration, deltaTime);
-        this.speed = newSpeed;
+        const deltaSpeed = this.getDeltaSpeed(acceleration, deltaTime);
+        this.speed.add(deltaSpeed);
 
         if (this.speed.length() <= 0.001) {
             this.speed = new Vector3(0, 0, 0);
         }
 
-        this.mesh.position.add(this.speed);
+        const deltaPosition = this.getDeltaPosition(this.speed, deltaTime);
+        this.mesh.position.add(deltaPosition);
         this.mesh.rotateY(this.steeringWheelDirection / 10);
     }
 
-    private getPosition(speed: Vector3, deltaTime: number): Vector3 {
+    private getDeltaPosition(speed: Vector3, deltaTime: number): Vector3 {
         if (deltaTime < 0) {
-            throw new Error("Invalid value for deltaTime, cannot be negative.");
+            throw new Error('Invalid value for deltaTime, cannot be negative.');
         }
         if (!speed) {
-            throw new Error("speed cannot be undefined");
+            throw new Error('speed cannot be undefined');
         }
         return speed.clone().multiplyScalar(deltaTime).add(this.speed);
     }
 
-    private getSpeed(acceleration: Vector3, deltaTime: number): Vector3 {
+    private getDeltaSpeed(acceleration: Vector3, deltaTime: number): Vector3 {
         if (deltaTime < 0) {
-            throw new Error("Invalid value for deltaTime, cannot be negative.");
+            throw new Error('Invalid value for deltaTime, cannot be negative.');
         }
         if (!acceleration) {
-            throw new Error("acceleration cannot be undefined");
+            throw new Error('acceleration cannot be undefined');
         }
-        return acceleration.multiplyScalar(deltaTime).add(this.speed);
+        return acceleration.multiplyScalar(deltaTime);
     }
 
     private getAcceleration(forces: Vector3[]): Vector3 {
         if (!forces) {
-            throw new Error("forces cannot be undefined");
+            throw new Error('forces cannot be undefined');
         }
         if (forces.length > 0) {
             const sumOfForces = new Vector3(0, 0, 0);
@@ -152,10 +152,9 @@ export class Car {
 
     private getWheelTorque(): Vector3 {
         if (this.isAcceleratorPressed) {
-            let torque = this.direction.multiplyScalar(this.engine.getWheelTorque());
+            const torque = this.direction.multiplyScalar(this.engine.getWheelTorque());
             return torque;
-        }
-        else {
+        } else {
             return new Vector3(0, 0, 0);
         }
     }

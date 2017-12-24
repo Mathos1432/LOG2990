@@ -12,7 +12,7 @@ export class BasicService {
     constructor(private http: Http) { }
 
     public basicGet(): Promise<Message> {
-        return this.http.get(BASE_URL + "basic")
+        return this.http.get(BASE_URL + 'basic')
             .toPromise()
             .then(response => response.json() as Message)
             .catch(this.handleError);

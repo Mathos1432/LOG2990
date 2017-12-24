@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild, HostListener } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { RenderService } from './render.service';
-import { Vector3 } from 'three';
 
 @Component({
     moduleId: module.id,

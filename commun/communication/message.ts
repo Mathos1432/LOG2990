@@ -1,4 +1,4 @@
-export class Message{
-    public title : string;
-    public body : string;
+export class Message {
+    public title: string;
+    public body: string;
 }
