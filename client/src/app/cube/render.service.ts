@@ -8,8 +8,16 @@ const NEAR_CLIPPING_PLANE = 1;
 const FIELD_OF_VIEW = 70;
 const CAMERA_Z = 800;
 
+const ACCELERATE_KEYCODE = 87;  // w
+const LEFT_KEYCODE = 65;        // a
+const BRAKE_KEYCODE = 83;       // s
+const RIGHT_KEYCODE = 68;       // d
+
 @Injectable()
 export class RenderService {
+    releasedAccelerator(): any {
+        throw new Error("Method not implemented.");
+    }
     private camera: PerspectiveCamera;
     private container: HTMLDivElement;
     private car: Car;
@@ -85,12 +93,42 @@ export class RenderService {
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
 
-    // TODO: Move out of render service.
-    public acceleratorPressed(): void {
-        this.car.isAcceleratorPressed = true;
+    handleKeyDown(event: KeyboardEvent): void {
+        // TODO: determine behavior when a and d are pressed at the same time.
+        switch (event.keyCode) {
+            case ACCELERATE_KEYCODE:
+                this.car.isAcceleratorPressed = true;
+                break;
+            case LEFT_KEYCODE:
+                this.car.steerLeft();
+                break;
+            case RIGHT_KEYCODE:
+                this.car.steerRight();
+                break;
+            case BRAKE_KEYCODE:
+                this.car.brake();
+                break;
+            default:
+                // Nothing to do.
+                break;
+        }
     }
 
-    public acceleratorReleased(): void {
-        this.car.isAcceleratorPressed = false;
+    handleKeyUp(event: KeyboardEvent): void {
+        switch (event.keyCode) {
+            case ACCELERATE_KEYCODE:
+                this.car.isAcceleratorPressed = false;
+                break;
+            case LEFT_KEYCODE:
+            case RIGHT_KEYCODE:
+                this.car.releaseSteering();
+                break;
+            case BRAKE_KEYCODE:
+                this.car.releaseBrakes();
+                break;
+            default:
+                // Nothing to do.
+                break;
+        }
     }
 }

@@ -1,20 +1,38 @@
-import { Object3D, Vector3, BoxGeometry, Mesh, MeshBasicMaterial, FaceColors, Vector2 } from "three";
+import { Object3D, Vector3, BoxGeometry, Mesh, MeshBasicMaterial, FaceColors, Vector2, Vector, Matrix4 } from "three";
+import { Engine } from "./engine";
+import { DEG_TO_RAD } from "../constants";
 
-const MAX_SPEED = 10;
-const ACCELERATOR_FORCE = new Vector3(5, 0, 0);
-const MAX_REVERSE_SPEED = -10;
-const MAX_FORWARD_SPEED = 15;
-const STATIC_FRICTION = 0.2;
-const BRAKE_POWER = 2;
-const MASS = 10;
+const AERODYNAMIC_DRAG = -0.4;
+const BRAKE_POWER = -10000;
+const ROLLING_RESISTANCE = -0.4;
+const MASS = 1730;              // 3814 pounds
+const WHEEL_RADIUS = 0.4064;    // 16 inches
 
 export class Car {
     public isAcceleratorPressed: boolean;
     public mesh: THREE.Mesh;
 
+    private engine: Engine;
+    private isBraking: boolean;
     private steeringWheelDirection: number;
     private speed: Vector3;
     private forces: Vector3[];
+
+    private get rotation(): Vector3 {
+        return this.mesh.rotation.toVector3();
+    }
+
+    private set rotation(newRotation: Vector3) {
+        this.mesh.rotation.setFromVector3(newRotation);
+    }
+
+    private get direction(): Vector3 {
+        const rotationMatrix = new Matrix4();
+        rotationMatrix.extractRotation(this.mesh.matrix);
+        const carDirection = new Vector3(0, 0, 1);
+        carDirection.applyMatrix4(rotationMatrix);
+        return carDirection;
+    }
 
     constructor() {
         const geometry = new BoxGeometry(50, 50, 50);
@@ -25,42 +43,120 @@ export class Car {
         }
         const material = new MeshBasicMaterial({ vertexColors: FaceColors, overdraw: 0.5 });
         this.mesh = new Mesh(geometry, material);
+        this.mesh.rotateX(90 * DEG_TO_RAD)
 
-        this.speed = new Vector3(-25, 0, 0);
+        this.isBraking = false;
+        this.steeringWheelDirection = 0;
+        this.engine = new Engine();
+        this.speed = new Vector3(0, 0, 0);
+    }
+
+    public steerLeft(): void {
+        this.steeringWheelDirection = 1;
+    }
+
+    public steerRight(): void {
+        this.steeringWheelDirection = -1;
+    }
+
+    public releaseSteering(): void {
+        this.steeringWheelDirection = 0;
+    }
+
+    public releaseBrakes(): void {
+        this.isBraking = false;
+    }
+
+    public brake(): void {
+        this.isBraking = true;
     }
 
     public update(deltaTime: number) {
+        deltaTime = deltaTime / 1000;
+        this.engine.update(this.speed, WHEEL_RADIUS);
+
         const forces = new Array<Vector3>();
 
-        // TODO: Accelerate/slowdown and steer
-        if (this.isAcceleratorPressed) {
-            forces.push(ACCELERATOR_FORCE);
+        forces.push(this.getTractionForce());
+        forces.push(this.getRollingResistance());
+        forces.push(this.getAerodynamicDrag());
+
+        if (this.isBraking && this.speed.length() > 0) {
+            forces.push(this.getBrakingForce());
         }
 
-        if (Math.abs(this.steeringWheelDirection) >= 0.001) {
-            // Add steering force.
+        const acceleration = this.getAcceleration(forces);
+        let newSpeed = this.getSpeed(acceleration, deltaTime);
+        this.speed = newSpeed;
+
+        if (this.speed.length() <= 0.001) {
+            this.speed = new Vector3(0, 0, 0);
         }
 
-        let friction = this.speed.clone().normalize();
-        friction.multiplyScalar(-1 * STATIC_FRICTION * 10);
-        forces.push(friction);
+        this.mesh.position.add(this.speed);
+        this.mesh.rotateY(this.steeringWheelDirection / 10);
+    }
 
+    private getPosition(speed: Vector3, deltaTime: number): Vector3 {
+        if (deltaTime < 0) {
+            throw new Error("Invalid value for deltaTime, cannot be negative.");
+        }
+        if (!speed) {
+            throw new Error("speed cannot be undefined");
+        }
+        return speed.clone().multiplyScalar(deltaTime).add(this.speed);
+    }
+
+    private getSpeed(acceleration: Vector3, deltaTime: number): Vector3 {
+        if (deltaTime < 0) {
+            throw new Error("Invalid value for deltaTime, cannot be negative.");
+        }
+        if (!acceleration) {
+            throw new Error("acceleration cannot be undefined");
+        }
+        return acceleration.multiplyScalar(deltaTime).add(this.speed);
+    }
+
+    private getAcceleration(forces: Vector3[]): Vector3 {
+        if (!forces) {
+            throw new Error("forces cannot be undefined");
+        }
         if (forces.length > 0) {
             const sumOfForces = new Vector3(0, 0, 0);
             forces.forEach(force => {
                 sumOfForces.add(force);
             });
-            let acceleration = sumOfForces.divideScalar(MASS);
-            this.speed.add(acceleration);
+            return sumOfForces.divideScalar(MASS);
         }
+        return new Vector3();
+    }
 
-        if (this.speed.length() <= 0.1) {
-            this.speed = new Vector3(0, 0, 0);
+    private getRollingResistance(): Vector3 {
+        return this.speed.clone().multiplyScalar(ROLLING_RESISTANCE);
+    }
+
+    private getTractionForce(): Vector3 {
+        const tractionForce = this.getWheelTorque().divideScalar(WHEEL_RADIUS);
+        return tractionForce;
+    }
+
+    private getBrakingForce(): Vector3 {
+        return this.direction.normalize().multiplyScalar(BRAKE_POWER);
+    }
+
+    private getAerodynamicDrag(): Vector3 {
+        const dragForce = this.speed.clone();
+        dragForce.multiplyScalar(dragForce.length() * AERODYNAMIC_DRAG);
+        return dragForce;
+    }
+
+    private getWheelTorque(): Vector3 {
+        if (this.isAcceleratorPressed) {
+            let torque = this.direction.multiplyScalar(this.engine.getWheelTorque());
+            return torque;
         }
-        this.speed.clampLength(MAX_REVERSE_SPEED, MAX_FORWARD_SPEED);
-        // TODO: update speed
-
-        this.mesh.position.add(this.speed);
-        // TODO: Check for collision
+        else {
+            return new Vector3(0, 0, 0);
+        }
     }
 }
