@@ -15,12 +15,6 @@ const RIGHT_KEY = 'd';
 
 export class GameComponent implements AfterViewInit {
 
-    @Input()
-    public rotationSpeedX = 0.005;
-
-    @Input()
-    public rotationSpeedY = 0.01;
-
     @ViewChild('container')
     private containerRef: ElementRef;
 
@@ -35,7 +29,7 @@ export class GameComponent implements AfterViewInit {
     public onKeyDown(event: KeyboardEvent) {
         switch (event.key.toLowerCase()) {
             case FORWARD_KEY:
-                // TODO: Move forward.
+                this.renderService.acceleratorPressed();
                 break;
             case LEFT_KEY:
             // TODO: Turn left
@@ -52,7 +46,7 @@ export class GameComponent implements AfterViewInit {
         // TODO: determine behavior when a and d are pressed at the same time.
         switch (event.key.toLowerCase()) {
             case FORWARD_KEY:
-                // TODO: release accelerator.
+                this.renderService.acceleratorReleased();
                 break;
             case LEFT_KEY:
                 // TODO: return steering wheel to 0.
@@ -67,7 +61,6 @@ export class GameComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        const rotationSpeed = new Vector3(this.rotationSpeedX, this.rotationSpeedY, 0);
-        this.renderService.initialize(this.containerRef.nativeElement, rotationSpeed);
+        this.renderService.initialize(this.containerRef.nativeElement);
     }
 }

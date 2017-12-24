@@ -1,39 +1,33 @@
 import { Injectable } from '@angular/core';
-import * as THREE from 'three';
 import Stats = require('stats.js');
-import { Vector3, Vector2 } from 'three';
+import { Vector3, PerspectiveCamera, WebGLRenderer, Scene } from 'three';
+import { Car } from './car';
 
 const FAR_CLIPPING_PLANE = 1000;
 const NEAR_CLIPPING_PLANE = 1;
 const FIELD_OF_VIEW = 70;
-const CAMERA_Z = 400;
-const DEFAULT_ROTATION_SPEED = new Vector3(0.005, 0.01, 0);
+const CAMERA_Z = 800;
 
 @Injectable()
 export class RenderService {
-    private camera: THREE.PerspectiveCamera;
+    private camera: PerspectiveCamera;
     private container: HTMLDivElement;
-    private cube: THREE.Mesh;
-    private renderer: THREE.WebGLRenderer;
-    private rotationSpeed: Vector3;
+    private car: Car;
+    private renderer: WebGLRenderer;
     private scene: THREE.Scene;
     private stats: Stats;
+    private lastDate: number;
 
     constructor() {
-        this.rotationSpeed = DEFAULT_ROTATION_SPEED;
+        this.car = new Car();
     }
 
-    public initialize(container: HTMLDivElement, rotationSpeed: Vector3) {
+    public initialize(container: HTMLDivElement) {
         if (container) {
             this.container = container;
         }
-        
-        if (rotationSpeed) {
-            this.rotationSpeed = rotationSpeed;
-        }
-        
+
         this.createScene();
-        this.createCube();
         this.initStats();
         this.startRenderingLoop();
     }
@@ -45,34 +39,15 @@ export class RenderService {
     }
 
     private update() {
-        const currentCubeRotation = this.cube.rotation;
-
-        const newRotation = new Vector3(
-            currentCubeRotation.x + this.rotationSpeed.x,
-            currentCubeRotation.y + this.rotationSpeed.y,
-            currentCubeRotation.z + this.rotationSpeed.z);
-
-        this.cube.rotation.setFromVector3(newRotation);
-    }
-
-    private createCube() {
-        const geometry = new THREE.BoxGeometry(50, 50, 50);
-
-        for (let i = 0; i < geometry.faces.length; i += 2) {
-            const randomColor = Math.random() * 0xffffff;
-            geometry.faces[i].color.setHex(randomColor);
-            geometry.faces[i + 1].color.setHex(randomColor);
-        }
-
-        const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors, overdraw: 0.5 });
-        this.cube = new THREE.Mesh(geometry, material);
-        this.scene.add(this.cube);
+        const timeSinceLastFrame = Date.now() - this.lastDate;
+        this.car.update(timeSinceLastFrame);
+        this.lastDate = Date.now();
     }
 
     private createScene() {
-        this.scene = new THREE.Scene();
+        this.scene = new Scene();
 
-        this.camera = new THREE.PerspectiveCamera(
+        this.camera = new PerspectiveCamera(
             FIELD_OF_VIEW,
             this.getAspectRatio(),
             NEAR_CLIPPING_PLANE,
@@ -80,6 +55,7 @@ export class RenderService {
         );
 
         this.camera.position.z = CAMERA_Z;
+        this.scene.add(this.car.mesh);
     }
 
     private getAspectRatio() {
@@ -87,10 +63,11 @@ export class RenderService {
     }
 
     private startRenderingLoop() {
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new WebGLRenderer();
         this.renderer.setPixelRatio(devicePixelRatio);
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
 
+        this.lastDate = Date.now();
         this.container.appendChild(this.renderer.domElement);
         this.render();
     }
@@ -106,5 +83,14 @@ export class RenderService {
         this.camera.aspect = this.getAspectRatio();
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    }
+
+    // TODO: Move out of render service.
+    public acceleratorPressed(): void {
+        this.car.isAcceleratorPressed = true;
+    }
+
+    public acceleratorReleased(): void {
+        this.car.isAcceleratorPressed = false;
     }
 }
