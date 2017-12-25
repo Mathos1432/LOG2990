@@ -11,11 +11,15 @@
       "check-space"
     ],
     "curly": true,
+    "deprecation": {
+      "severity": "warn"
+    },
     "eofline": true,
     "forin": true,
     "import-blacklist": [
       true,
-      "rxjs"
+      "rxjs",
+      "rxjs/Rx"
     ],
     "import-spacing": true,
     "indent": [
@@ -28,7 +32,7 @@
       true,
       140
     ],
-    "member-access": true,
+    "member-access": [true, "check-accessor", "check-constructor", "check-parameter-property"],
     "member-ordering": [
       true,
       {
@@ -48,7 +52,8 @@
       "info",
       "time",
       "timeEnd",
-      "trace"
+      "trace",
+      "log"
     ],
     "no-construct": true,
     "no-debugger": true,
@@ -69,7 +74,6 @@
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
     "no-unused-expression": true,
-    "no-unused-variable": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
@@ -80,13 +84,11 @@
       "check-else",
       "check-whitespace"
     ],
-    "cyclomatic-complexity": [ true, 20],
-    "max-classes-per-file": [true, 2],
-    "no-unsafe-finally": true,
     "prefer-const": true,
     "quotemark": [
-      true,
-      "single"
+      true, 
+      "double", 
+      "avoid-escape"
     ],
     "radix": true,
     "semicolon": [
@@ -109,7 +111,11 @@
     ],
     "typeof-compare": true,
     "unified-signatures": true,
-    "variable-name": true,
+    "variable-name": [true, 
+      "ban-keywords", 
+      "check-format", 
+      "allow-leading-underscore"
+    ],
     "whitespace": [
       true,
       "check-branch",
@@ -118,7 +124,6 @@
       "check-separator",
       "check-type"
     ],
-
     "directive-selector": [
       true,
       "attribute",
@@ -131,6 +136,7 @@
       "app",
       "kebab-case"
     ],
+    "no-output-on-prefix": true,
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,
@@ -140,12 +146,39 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "no-access-missing-member": true,
-    "templates-use-public": true,
-    "invoke-injectable": true,
 
     // rules added by Dylan
     "no-sparse-arrays": true,
-    "no-irregular-whitespace": true
+    "no-irregular-whitespace": true,
+    "cyclomatic-complexity": [ true, 20],
+    "max-classes-per-file": [true, 2],
+    "no-unsafe-finally": true,
+    "no-unused-variable": true,
+    "align": [true, "arguments", "elements", "members", "parameters", "statements"],
+    "arrow-parens": true,
+    "no-any" : true,
+    "no-magic-numbers": true,
+    "only-arrow-functions": true,
+    "adjacent-overload-signatures": true,
+    "max-file-line-count": [true, 300],
+    "no-duplicate-imports": true,
+    "binary-expression-operand-order": true,
+    "newline-before-return": true,
+    "no-angle-bracket-type-assertion": true,
+    "no-boolean-literal-compare": true,
+    "no-consecutive-blank-lines": true,
+    "number-literal-format": true,
+    "prefer-method-signature": true,
+    "return-undefined": true,
+    "use-isnan": true,
+    "prefer-for-of": true,
+    "promise-function-async": true,
+    "await-promise": true,
+    "no-floating-promises": true,
+    "no-invalid-this": [true, "check-function-in-method"],
+    "no-return-await": true,
+    "no-this-assignment": [true, {"allowed-names": ["^self$"], "allow-destructuring": false}],
+    "prefer-conditional-expression": [true, "check-else-if"],
+    "switch-default": true
   }
 }
