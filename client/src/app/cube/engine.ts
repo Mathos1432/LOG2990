@@ -1,15 +1,15 @@
-import { Vector3 } from "three";
-import { PI, MIN_TO_SEC } from "../constants";
+import { Vector3 } from 'three';
+import { PI, MIN_TO_SEC } from '../constants';
 
 const GEAR_RATIOS = [
-    4.06,
-    2.3,
-    1.6,
-    1.25,
-    1.00,
-    0.8
+    4.62,
+    3.04,
+    2.07,
+    1.66,
+    1.26,
+    1.00
 ];
-const DRIVE_RATIO = 3.8;
+const DRIVE_RATIO = 3.27;
 
 const DOWNSHIFT_RPM = 1000;
 const MIN_RPM = 500;
@@ -40,30 +40,29 @@ export class Engine {
 
     private getRPM(speed: Vector3, wheelRadius: number): number {
         const wheelAngularVelocity = speed.length() / wheelRadius;
-        let rpm = (wheelAngularVelocity / (PI * 2)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
+        let rpm = (wheelAngularVelocity / (2 * PI)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
         rpm = rpm < MIN_RPM ? MIN_RPM : rpm;
-
         return rpm;
     }
 
     public getWheelTorque() {
         const wheelTorque = this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
-
         return wheelTorque;
     }
 
     private getTorque() {
         let torque: number;
-        if (this.RPM <= 1000) {
-            torque = this.RPM / 1000 + 350;
-        } else if (this.RPM <= 4500) {
-            torque = (this.RPM / 50) + 350;
-        } else if (this.RPM <= 6000) {
-            torque = 450;
-        } else {
-            return 450 - (this.RPM / 6000);
+        const maxTorque = 295;
+        if (this.RPM <= 1500) {
+            torque = 100 + this.RPM / 20;
         }
-        
+        else if (this.RPM <= 3000) {
+            torque = (this.RPM - 1500) / 10 + 195;
+        } else if (this.RPM <= 5000) {
+            torque = maxTorque;
+        } else {
+            return maxTorque - (this.RPM / 6000);
+        }
         return torque;
     }
 }

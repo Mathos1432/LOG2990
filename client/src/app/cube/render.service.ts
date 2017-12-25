@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import Stats = require("stats.js");
-import { PerspectiveCamera, WebGLRenderer, Scene } from "three";
+import { PerspectiveCamera, WebGLRenderer, Scene, AmbientLight } from "three";
 import { Car } from "./car";
 
 const FAR_CLIPPING_PLANE = 1000;
@@ -27,12 +27,12 @@ export class RenderService {
         this.car = new Car();
     }
 
-    public initialize(container: HTMLDivElement) {
+    public async initialize(container: HTMLDivElement) {
         if (container) {
             this.container = container;
         }
 
-        this.createScene();
+        await this.createScene();
         this.initStats();
         this.startRenderingLoop();
     }
@@ -49,7 +49,7 @@ export class RenderService {
         this.lastDate = Date.now();
     }
 
-    private createScene() {
+    private async createScene() {
         this.scene = new Scene();
 
         this.camera = new PerspectiveCamera(
@@ -59,8 +59,11 @@ export class RenderService {
             FAR_CLIPPING_PLANE
         );
 
-        this.camera.position.z = CAMERA_Z;
+        await this.car.init();
+        this.camera.position.set(0, 10, 0);
+        this.camera.lookAt(this.car.mesh.position);
         this.scene.add(this.car.mesh);
+        this.scene.add(new AmbientLight(0xffffff, 0.5));
     }
 
     private getAspectRatio() {
