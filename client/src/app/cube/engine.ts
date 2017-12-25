@@ -1,5 +1,5 @@
-import { Vector3 } from 'three';
-import { PI, MIN_TO_SEC } from '../constants';
+import { Vector3 } from "three";
+import { PI, MIN_TO_SEC } from "../constants";
 
 const GEAR_RATIOS = [
     4.06,
@@ -40,13 +40,15 @@ export class Engine {
 
     private getRPM(speed: Vector3, wheelRadius: number): number {
         const wheelAngularVelocity = speed.length() / wheelRadius;
-        let rpm = (wheelAngularVelocity / (2 * PI)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
+        let rpm = (wheelAngularVelocity / (PI * 2)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
         rpm = rpm < MIN_RPM ? MIN_RPM : rpm;
+
         return rpm;
     }
 
     public getWheelTorque() {
         const wheelTorque = this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
+
         return wheelTorque;
     }
 
@@ -61,6 +63,7 @@ export class Engine {
         } else {
             return 450 - (this.RPM / 6000);
         }
+        
         return torque;
     }
 }

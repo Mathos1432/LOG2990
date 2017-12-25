@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import Stats = require('stats.js');
-import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
-import { Car } from './car';
+import { Injectable } from "@angular/core";
+import Stats = require("stats.js");
+import { PerspectiveCamera, WebGLRenderer, Scene } from "three";
+import { Car } from "./car";
 
 const FAR_CLIPPING_PLANE = 1000;
 const NEAR_CLIPPING_PLANE = 1;
@@ -23,7 +23,7 @@ export class RenderService {
     private stats: Stats;
     private lastDate: number;
 
-    constructor() {
+    public constructor() {
         this.car = new Car();
     }
 
@@ -39,7 +39,7 @@ export class RenderService {
 
     private initStats() {
         this.stats = new Stats();
-        this.stats.dom.style.position = 'absolute';
+        this.stats.dom.style.position = "absolute";
         this.container.appendChild(this.stats.dom);
     }
 
@@ -106,7 +106,6 @@ export class RenderService {
                 this.car.brake();
                 break;
             default:
-                // Nothing to do.
                 break;
         }
     }
@@ -124,7 +123,6 @@ export class RenderService {
                 this.car.releaseBrakes();
                 break;
             default:
-                // Nothing to do.
                 break;
         }
     }

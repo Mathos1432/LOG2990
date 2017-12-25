@@ -1,13 +1,12 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
+import { HttpClientModule } from "@angular/common/http";
 
-import { AppComponent } from './app.component';
-import { GameComponent } from './cube/game.component';
+import { AppComponent } from "./app.component";
+import { GameComponent } from "./cube/game.component";
 
-import { RenderService } from './cube/render.service';
-import { BasicService } from './basic.service';
-
+import { RenderService } from "./cube/render.service";
+import { BasicService } from "./basic.service";
 
 @NgModule({
     declarations: [
@@ -16,7 +15,7 @@ import { BasicService } from './basic.service';
     ],
     imports: [
         BrowserModule,
-        HttpModule
+        HttpClientModule
     ],
     providers: [
         RenderService,

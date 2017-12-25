@@ -1,15 +1,15 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed, inject } from "@angular/core/testing";
 
-import { RenderService } from './render.service';
+import { RenderService } from "./render.service";
 
-describe('RenderService', () => {
+describe("RenderService", () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [RenderService]
         });
     });
 
-    it('should be created', inject([RenderService], (service: RenderService) => {
+    it("should be created", inject([RenderService], (service: RenderService) => {
         expect(service).toBeTruthy();
     }));
 });
