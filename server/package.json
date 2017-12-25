@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "tsc && concurrently --kill-others \"tsc -w \" \"nodemon out/server/app/www.js\" ",
-    "lint": "tslint app/**/*.ts app/*.ts --force -t verbose",
+    "lint": "tslint --project tsconfig.json \"./app/**/*.ts\"",
     "test": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
     "test-once": "tsc && karma start karma.conf.js --single-run || npm run-script coverage",
     "coverage": "remap-istanbul -i coverage/coverage-final.json -o coverage -t html",
@@ -20,9 +20,11 @@
     "cors": "~2.8.1",
     "debug": "~2.2.0",
     "express": "4.15.4",
+    "inversify": "^4.3.0",
     "morgan": "1.7.0",
     "nodemon": "^1.11.0",
     "pug": "^2.0.0-alpha6",
+    "reflect-metadata": "^0.1.10",
     "serve-favicon": "~2.3.0",
     "socket.io": "1.4.4",
     "systemjs": "0.19.39"
@@ -52,8 +54,8 @@
     "mocha": "3.5.0",
     "remap-istanbul": "^0.8.4",
     "rimraf": "^2.5.4",
-    "tslint": "^4.2.0",
+    "tslint": "^5.8.0",
     "tslint-eslint-rules": "^3.2.3",
-    "typescript": "^2.4.2"
+    "typescript": "~2.4.2"
   }
 }
