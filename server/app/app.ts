@@ -1,114 +1,73 @@
-/**
- * app.ts - Configures an Express application.
- *
- * @authors Nicolas Richard, Emilio Riviera
- * @date 2017/01/09
- */
+import * as express from "express";
+import * as path from "path";
+import * as logger from "morgan";
+import * as cookieParser from "cookie-parser";
+import * as bodyParser from "body-parser";
+import * as cors from "cors";
+import Types from "./types";
+import { injectable, inject } from "inversify";
+import { Routes } from "./routes";
 
-import * as express from 'express';
-import * as path from 'path';
-import * as logger from 'morgan';
-import * as cookieParser from 'cookie-parser';
-import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
-
-import * as indexRoute from './routes/index';
-
+@injectable()
 export class Application {
 
-  public app: express.Application;
+    private readonly internalError = 500;
+    public app: express.Application;
 
-  /**
-   * Bootstrap the application.
-   *
-   * @class Server
-   * @method bootstrap
-   * @static
-   * @return {ng.auto.IInjectorService} Returns the newly created injector for this this.app.
-   */
-  public static bootstrap(): Application {
-    return new Application();
-  }
+    constructor(@inject(Types.Routes) private api: Routes) {
+        this.app = express();
 
-  /**
-   * Constructor.
-   *
-   * @class Server
-   * @constructor
-   */
-  constructor() {
+        this.config();
 
-    // Application instantiation
-    this.app = express();
+        this.routes();
+    }
 
-    // configure this.application
-    this.config();
+    private config() {
+        // Middlewares configuration
+        this.app.use(logger("dev"));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(cookieParser());
+        this.app.use(express.static(path.join(__dirname, "../client")));
+        this.app.use(cors());
+    }
 
-    // configure routes
-    this.routes();
-  }
+    public routes() {
+        let router: express.Router;
+        router = express.Router();
 
-  /**
-   * The config function.
-   *
-   * @class Server
-   * @method config
-   */
-  private config() {
-    // Middlewares configuration
-    this.app.use(logger('dev'));
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
-    this.app.use(cookieParser());
-    this.app.use(express.static(path.join(__dirname, '../client')));
-    this.app.use(cors());
-  }
+        router.use(this.api.routes);
 
-  /**
-   * The routes function.
-   *
-   * @class Server
-   * @method routes
-   */
-  public routes() {
-    let router: express.Router;
-    router = express.Router();
+        this.app.use(router);
 
-    // create routes
-    const index: indexRoute.Index = new indexRoute.Index();
+        // Gestion des erreurs
+        this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            const err = new Error("Not Found");
+            next(err);
+        });
 
-    // home page
-    router.get('/basic', index.index.bind(index.index));
+        // development error handler
+        // will print stacktrace
+        if (this.app.get("env") === "development") {
+            // tslint:disable-next-line:no-any
+            this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+                res.status(err.status || this.internalError);
+                res.send({
+                    message: err.message,
+                    error: err
+                });
+            });
+        }
 
-    // use router middleware
-    this.app.use(router);
-
-    // Gestion des erreurs
-    this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const err = new Error('Not Found');
-        next(err);
-    });
-
-    // development error handler
-    // will print stacktrace
-    if (this.app.get('env') === 'development') {
+        // production error handler
+        // no stacktraces leaked to user (in production env only)
+        // tslint:disable-next-line:no-any
         this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-            res.status(err.status || 500);
+            res.status(err.status || this.internalError);
             res.send({
                 message: err.message,
-                error: err
+                error: {}
             });
         });
     }
-
-    // production error handler
-    // no stacktraces leaked to user (in production env only)
-    this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.status(err.status || 500);
-        res.send({
-            message: err.message,
-            error: {}
-        });
-    });
-  }
 }
