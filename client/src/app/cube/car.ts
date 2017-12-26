@@ -4,36 +4,36 @@ import { DEG_TO_RAD } from "../constants";
 import { directiveDef } from "@angular/core/src/view/provider";
 import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from "@angular/platform-browser-dynamic/src/platform_providers";
 import { concat } from "rxjs/operators/concat";
+import { Wheel } from "./wheel";
 
 const DRAG_CONSTANT = 0.45;
 const BRAKE_POWER = -10000;
 const ROLLING_RESISTANCE = 13.45;
 const MASS = 1515;              // 3339 pounds
-const WHEEL_RADIUS = 0.45;      // 18 inches
-const WHEEL_MASS = 10;
-const TIRE_FRICTION_COEFFICIENT = 1;
+
 const WHEELBASE = 2.78;
 const MESH_ROTATION = new Euler(0, Math.PI / 2, 0);
 const SLIP_CONSTANT = 300;
 const STEERING_ANGLE = Math.PI / 16;
+const GRAVITY = -9.81;          // m/s
 
 export class Car extends Object3D {
     public isAcceleratorPressed: boolean;
     public mesh: Object3D;
 
+    private rearWheel: Wheel;
     private engine: Engine;
     private isBraking: boolean;
     private steeringWheelDirection: number;
     private speed: Vector3;
     private weightRear: number;
-    private rearWheelAngularVelocity: number;
 
     private get VLong(): number {
-        return 0;
+        return this.speed.x;
     }
 
     private get VLat(): number {
-        return 0;
+        return this.speed.z;
     }
 
     private get direction(): Vector3 {
@@ -49,9 +49,9 @@ export class Car extends Object3D {
         this.isBraking = false;
         this.steeringWheelDirection = 0;
         this.engine = new Engine();
+        this.rearWheel = new Wheel();
         this.weightRear = 0.5;
         this.speed = new Vector3(0, 0, 0);
-        this.rearWheelAngularVelocity = 0;
     }
 
     private async load(): Promise<Object3D> {
@@ -68,7 +68,6 @@ export class Car extends Object3D {
         this.mesh.setRotationFromEuler(MESH_ROTATION);
         this.add(this.mesh);
     }
-
 
     public steerLeft(): void {
         this.steeringWheelDirection = STEERING_ANGLE;
@@ -102,12 +101,12 @@ export class Car extends Object3D {
         this.speed.applyMatrix4(rotationMatrix);
 
         // Physics calculations
-        this.rearWheelAngularVelocity += this.getAngularAcceleration() * deltaTime;
-        this.engine.update(this.speed, WHEEL_RADIUS);
+        this.rearWheel.angularVelocity += this.getAngularAcceleration() * deltaTime;
+        this.engine.update(this.speed, this.rearWheel.radius);
         this.weightRear = this.getWeightDistribution();
         this.speed.add(this.getDeltaSpeed(deltaTime));
         this.mesh.position.add(this.getDeltaPosition(deltaTime));
-        this.rearWheelAngularVelocity = this.speed.length() / WHEEL_RADIUS;
+        this.rearWheel.update(this.speed.length());
 
         // Move back to good coordinates
         this.speed = this.speed.clone().applyQuaternion(rotationQuaternion.inverse());
@@ -123,7 +122,6 @@ export class Car extends Object3D {
     }
 
     public getTractionForce(): number {
-        // TODO: determine if force has the right sign.
         const force = this.direction.clone().multiplyScalar(this.getEngineForce());
         const slipPeak = Math.min(SLIP_CONSTANT * this.getSlipRatio(), 6000);
         const maximumForce = slipPeak * this.weightRear;
@@ -131,29 +129,23 @@ export class Car extends Object3D {
     }
 
     public getSlipRatio(): number {
-        return (this.rearWheelAngularVelocity * WHEEL_RADIUS - this.direction.x) / Math.abs(this.direction.x);
-
+        return (this.rearWheel.angularVelocity * this.rearWheel.radius - this.direction.x) / Math.abs(this.direction.x);
     }
 
     private getAngularAcceleration(): number {
-        return this.getTotalTorque() / (this.getWheelInertia() * 2);
-    }
-
-    private getWheelInertia(): number {
-        return WHEEL_MASS * WHEEL_RADIUS * WHEEL_RADIUS / 2;
+        return this.getTotalTorque() / (this.rearWheel.inertia * 2);
     }
 
     public getBrakeForce(): Vector3 {
-        return this.direction.multiplyScalar(BRAKE_POWER);
+        return this.direction.multiplyScalar(this.rearWheel.frictionCoefficient * MASS * GRAVITY)
     }
 
     public getBrakeTorque(): number {
-        // TODO: determine sign of the force.
-        return this.getBrakeForce().length() * WHEEL_RADIUS;
+        return this.getBrakeForce().length() * this.rearWheel.radius;
     }
 
     public getTractionTorque(): number {
-        return this.getTractionForce() * WHEEL_RADIUS;
+        return this.getTractionForce() * this.rearWheel.radius;
     }
 
     public getTotalTorque(): number {
@@ -161,7 +153,7 @@ export class Car extends Object3D {
     }
 
     public getEngineForce(): number {
-        return this.engine.getDriveTorque() / WHEEL_RADIUS;
+        return this.engine.getDriveTorque() / this.rearWheel.radius;
     }
 
     public getDragForce(): Vector3 {

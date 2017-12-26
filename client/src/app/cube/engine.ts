@@ -47,8 +47,7 @@ export class Engine {
     }
 
     public getDriveTorque() {
-        const wheelTorque = this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear] * TRANSMISSION_EFFICIENCY;
-        return wheelTorque;
+        return this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear] * TRANSMISSION_EFFICIENCY;
     }
 
     private getTorque() {
