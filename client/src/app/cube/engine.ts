@@ -1,7 +1,7 @@
-import { Vector3 } from 'three';
-import { PI, MIN_TO_SEC } from '../constants';
+import { Vector3 } from "three";
+import { PI, MIN_TO_SEC } from "../constants";
 
-const GEAR_RATIOS = [
+const GEAR_RATIOS: number[] = [
     4.62,
     3.04,
     2.07,
@@ -9,12 +9,12 @@ const GEAR_RATIOS = [
     1.26,
     1.00
 ];
-const DRIVE_RATIO = 3.27;
+const DRIVE_RATIO: number = 3.27;
 
-const DOWNSHIFT_RPM = 1000;
-const MIN_RPM = 800;
-const SHIFT_RPM = 5000;
-const TRANSMISSION_EFFICIENCY = 1;
+const DOWNSHIFT_RPM: number = 1000;
+const MIN_RPM: number = 800;
+const SHIFT_RPM: number = 5000;
+const TRANSMISSION_EFFICIENCY: number = 1;
 
 export class Engine {
     private currentGear: number;
@@ -25,8 +25,8 @@ export class Engine {
         this.RPM = MIN_RPM;
     }
 
-    public update(speed: Vector3, wheelRadius: number) {
-        let currentRPM = this.getRPM(speed, wheelRadius);
+    public update(speed: Vector3, wheelRadius: number): void {
+        let currentRPM: number = this.getRPM(speed, wheelRadius);
 
         if (currentRPM > SHIFT_RPM && this.currentGear < GEAR_RATIOS.length) {
             this.currentGear++;
@@ -40,29 +40,31 @@ export class Engine {
     }
 
     private getRPM(speed: Vector3, wheelRadius: number): number {
-        const wheelAngularVelocity = speed.length() / wheelRadius;
-        let rpm = (wheelAngularVelocity / (2 * PI)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
+        const wheelAngularVelocity: number = speed.length() / wheelRadius;
+        let rpm: number = (wheelAngularVelocity / (PI * 2)) * MIN_TO_SEC * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
         rpm = rpm < MIN_RPM ? MIN_RPM : rpm;
+
         return rpm;
     }
 
-    public getDriveTorque() {
+    public getDriveTorque(): number {
         return this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear] * TRANSMISSION_EFFICIENCY;
     }
 
-    private getTorque() {
-        let torque = 295;
-        const maxTorque = 295;
+    private getTorque(): number {
+        let torque: number = 295;
+        const maxTorque: number = 295;
+
         if (this.RPM <= 1500) {
-            torque = 100 + this.RPM / 20;
-        }
-        else if (this.RPM <= 3000) {
+            torque = this.RPM / 20 + 100;
+        } else if (this.RPM <= 3000) {
             torque = (this.RPM - 1500) / 10 + 195;
         } else if (this.RPM <= 5000) {
             torque = maxTorque;
         } else {
             return maxTorque - (this.RPM / 6000);
         }
+
         return torque;
     }
 }

@@ -3,14 +3,14 @@ import Stats = require("stats.js");
 import { PerspectiveCamera, WebGLRenderer, Scene, AmbientLight } from "three";
 import { Car } from "./car";
 
-const FAR_CLIPPING_PLANE = 1000;
-const NEAR_CLIPPING_PLANE = 1;
-const FIELD_OF_VIEW = 70;
+const FAR_CLIPPING_PLANE: number = 1000;
+const NEAR_CLIPPING_PLANE: number = 1;
+const FIELD_OF_VIEW: number = 70;
 
-const ACCELERATE_KEYCODE = 87;  // w
-const LEFT_KEYCODE = 65;        // a
-const BRAKE_KEYCODE = 83;       // s
-const RIGHT_KEYCODE = 68;       // d
+const ACCELERATE_KEYCODE: number = 87;  // w
+const LEFT_KEYCODE: number = 65;        // a
+const BRAKE_KEYCODE: number = 83;       // s
+const RIGHT_KEYCODE: number = 68;       // d
 
 @Injectable()
 export class RenderService {
@@ -26,7 +26,7 @@ export class RenderService {
         this.car = new Car();
     }
 
-    public async initialize(container: HTMLDivElement) {
+    public async initialize(container: HTMLDivElement): Promise<void> {
         if (container) {
             this.container = container;
         }
@@ -36,19 +36,19 @@ export class RenderService {
         this.startRenderingLoop();
     }
 
-    private initStats() {
+    private initStats(): void {
         this.stats = new Stats();
         this.stats.dom.style.position = "absolute";
         this.container.appendChild(this.stats.dom);
     }
 
-    private update() {
-        const timeSinceLastFrame = Date.now() - this.lastDate;
+    private update(): void {
+        const timeSinceLastFrame: number = Date.now() - this.lastDate;
         this.car.update(timeSinceLastFrame);
         this.lastDate = Date.now();
     }
 
-    private async createScene() {
+    private async createScene(): Promise<void> {
         this.scene = new Scene();
 
         this.camera = new PerspectiveCamera(
@@ -63,14 +63,14 @@ export class RenderService {
         this.camera.lookAt(this.car.mesh.position);
         this.camera.position.set(0, 25, 0);
         this.scene.add(this.car.mesh);
-        this.scene.add(new AmbientLight(0xffffff, 0.5));
+        this.scene.add(new AmbientLight(0xFFFFFF, 0.5));
     }
 
-    private getAspectRatio() {
+    private getAspectRatio(): number {
         return this.container.clientWidth / this.container.clientHeight;
     }
 
-    private startRenderingLoop() {
+    private startRenderingLoop(): void {
         this.renderer = new WebGLRenderer();
         this.renderer.setPixelRatio(devicePixelRatio);
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
@@ -80,14 +80,14 @@ export class RenderService {
         this.render();
     }
 
-    private render() {
+    private render(): void {
         requestAnimationFrame(() => this.render());
         this.update();
         this.renderer.render(this.scene, this.camera);
         this.stats.update();
     }
 
-    public onResize() {
+    public onResize(): void {
         this.camera.aspect = this.getAspectRatio();
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);

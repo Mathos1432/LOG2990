@@ -1,3 +1,5 @@
+/* tslint:disable */
+// Disable tslint in this file because it is given by angular cli
 // This file is required by karma.conf.js and loads recursively all the .spec and framework files
 
 import "zone.js/dist/long-stack-trace-zone";
@@ -13,13 +15,10 @@ import {
 } from "@angular/platform-browser-dynamic/testing";
 
 // Unfortunately there's no typing for the `__karma__` variable. Just declare it as any.
-// tslint:disable-next-line:no-any
 declare const __karma__: any;
-// tslint:disable-next-line:no-any
 declare const require: any;
 
 // Prevent Karma from running prematurely.
-// tslint:disable-next-line:only-arrow-functions
 __karma__.loaded = function () {};
 
 // First, initialize the Angular testing environment.

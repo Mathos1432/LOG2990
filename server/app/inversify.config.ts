@@ -5,7 +5,7 @@ import { Application } from "./app";
 import { Index } from "./routes/index";
 import { Routes } from "./routes";
 
-const container = new Container();
+const container: Container = new Container();
 
 container.bind(Types.Server).to(Server);
 container.bind(Types.Application).to(Application);

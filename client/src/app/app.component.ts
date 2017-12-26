@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
 
     public constructor(private basicService: BasicService) { }
 
-    public readonly title = "LOG2990";
+    public readonly title: string = "LOG2990";
     public message: string;
 
     public ngOnInit(): void {

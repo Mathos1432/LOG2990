@@ -11,7 +11,7 @@ import { Routes } from "./routes";
 @injectable()
 export class Application {
 
-    private readonly internalError = 500;
+    private readonly internalError: number = 500;
     public app: express.Application;
 
     constructor(@inject(Types.Routes) private api: Routes) {
@@ -22,7 +22,7 @@ export class Application {
         this.routes();
     }
 
-    private config() {
+    private config(): void {
         // Middlewares configuration
         this.app.use(logger("dev"));
         this.app.use(bodyParser.json());
@@ -32,17 +32,20 @@ export class Application {
         this.app.use(cors());
     }
 
-    public routes() {
-        let router: express.Router;
-        router = express.Router();
+    public routes(): void {
+        const router: express.Router = express.Router();
 
         router.use(this.api.routes);
 
         this.app.use(router);
 
+        this.errorHandeling();
+    }
+
+    private errorHandeling(): void {
         // Gestion des erreurs
         this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-            const err = new Error("Not Found");
+            const err: Error = new Error("Not Found");
             next(err);
         });
 

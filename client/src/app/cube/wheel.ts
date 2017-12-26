@@ -1,6 +1,6 @@
-const WHEEL_RADIUS = 0.45;      // 18 inches
-const WHEEL_MASS = 10;          // 10 kg
-const TIRE_FRICTION_COEFFICIENT = 1;
+const WHEEL_RADIUS: number = 0.45;      // 18 inches
+const WHEEL_MASS: number = 10;          // 10 kg
+const TIRE_FRICTION_COEFFICIENT: number = 1;
 
 export class Wheel {
     private _angularVelocity: number;
@@ -14,7 +14,7 @@ export class Wheel {
     }
 
     public get inertia(): number {
-        return this._mass * this._radius * this._radius / 2
+        return this._mass * this._radius * this._radius / 2;
     }
 
     public get radius(): number {
@@ -26,11 +26,11 @@ export class Wheel {
     }
 
     public constructor(
-        private _mass = WHEEL_MASS,
-        private _radius = WHEEL_RADIUS,
-        private _frictionCoefficient = TIRE_FRICTION_COEFFICIENT) { }
+        private _mass: number = WHEEL_MASS,
+        private _radius: number = WHEEL_RADIUS,
+        private _frictionCoefficient: number = TIRE_FRICTION_COEFFICIENT) { }
 
-    public update(speed: number) {
+    public update(speed: number): void {
         this._angularVelocity = speed / this.radius;
     }
 }
