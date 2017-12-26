@@ -1,3 +1,5 @@
+import { Vector3 } from "three";
+
 const WHEEL_RADIUS: number = 0.45;      // 18 inches
 const WHEEL_MASS: number = 10;          // 10 kg
 const TIRE_FRICTION_COEFFICIENT: number = 1;
@@ -32,5 +34,9 @@ export class Wheel {
 
     public update(speed: number): void {
         this._angularVelocity = speed / this.radius;
+    }
+
+    public getSlipRatio(speed: Vector3): number {
+        return (this.angularVelocity * this.radius - speed.x) / Math.abs(speed.x);
     }
 }

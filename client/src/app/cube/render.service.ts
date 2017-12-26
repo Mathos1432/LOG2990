@@ -16,14 +16,18 @@ const RIGHT_KEYCODE: number = 68;       // d
 export class RenderService {
     private camera: PerspectiveCamera;
     private container: HTMLDivElement;
-    private car: Car;
+    private _car: Car;
     private renderer: WebGLRenderer;
     private scene: THREE.Scene;
     private stats: Stats;
     private lastDate: number;
 
+    public get car(): Car {
+        return this._car;
+    }
+
     public constructor() {
-        this.car = new Car();
+        this._car = new Car();
     }
 
     public async initialize(container: HTMLDivElement): Promise<void> {
@@ -44,7 +48,7 @@ export class RenderService {
 
     private update(): void {
         const timeSinceLastFrame: number = Date.now() - this.lastDate;
-        this.car.update(timeSinceLastFrame);
+        this._car.update(timeSinceLastFrame);
         this.lastDate = Date.now();
     }
 
@@ -58,11 +62,11 @@ export class RenderService {
             FAR_CLIPPING_PLANE
         );
 
-        await this.car.init();
+        await this._car.init();
         this.camera.position.set(0, 25, 0);
-        this.camera.lookAt(this.car.mesh.position);
+        this.camera.lookAt(this._car.mesh.position);
         this.camera.position.set(0, 25, 0);
-        this.scene.add(this.car.mesh);
+        this.scene.add(this._car.mesh);
         this.scene.add(new AmbientLight(0xFFFFFF, 0.5));
     }
 
@@ -93,37 +97,39 @@ export class RenderService {
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
 
+
+    // TODO: Create an event handler service.
     public handleKeyDown(event: KeyboardEvent): void {
-        // TODO: determine behavior when a and d are pressed at the same time.
         switch (event.keyCode) {
             case ACCELERATE_KEYCODE:
-                this.car.isAcceleratorPressed = true;
+                this._car.isAcceleratorPressed = true;
                 break;
             case LEFT_KEYCODE:
-                this.car.steerLeft();
+                this._car.steerLeft();
                 break;
             case RIGHT_KEYCODE:
-                this.car.steerRight();
+                this._car.steerRight();
                 break;
             case BRAKE_KEYCODE:
-                this.car.brake();
+                this._car.brake();
                 break;
             default:
                 break;
         }
     }
 
+    // TODO: Create an event handler service.
     public handleKeyUp(event: KeyboardEvent): void {
         switch (event.keyCode) {
             case ACCELERATE_KEYCODE:
-                this.car.isAcceleratorPressed = false;
+                this._car.isAcceleratorPressed = false;
                 break;
             case LEFT_KEYCODE:
             case RIGHT_KEYCODE:
-                this.car.releaseSteering();
+                this._car.releaseSteering();
                 break;
             case BRAKE_KEYCODE:
-                this.car.releaseBrakes();
+                this._car.releaseBrakes();
                 break;
             default:
                 break;

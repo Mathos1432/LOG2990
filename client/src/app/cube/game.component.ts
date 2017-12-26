@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, HostListener } from "@angular/core";
 import { RenderService } from "./render.service";
+import { Car } from "./car";
 
 @Component({
     moduleId: module.id,
@@ -32,5 +33,9 @@ export class GameComponent implements AfterViewInit {
 
     public ngAfterViewInit(): void {
         this.renderService.initialize(this.containerRef.nativeElement);
+    }
+
+    public get car(): Car {
+        return this.renderService.car;
     }
 }
