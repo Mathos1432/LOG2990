@@ -1,4 +1,5 @@
-import { Vector3,
+import {
+    Vector3,
     BoxGeometry,
     Mesh,
     MeshBasicMaterial,
@@ -8,7 +9,8 @@ import { Vector3,
     ObjectLoader,
     Euler,
     Quaternion,
-    Matrix3 } from "three";
+    Matrix3
+} from "three";
 import { Engine } from "./engine";
 import { DEG_TO_RAD } from "../constants";
 import { directiveDef } from "@angular/core/src/view/provider";
@@ -65,15 +67,6 @@ export class Car extends Object3D {
         this.speed = new Vector3(0, 0, 0);
     }
 
-    private async load(): Promise<Object3D> {
-        return new Promise<Object3D>((resolve, reject) => {
-            const loader: ObjectLoader = new ObjectLoader();
-            loader.load("../../assets/camero/camero-2010-low-poly.json", (object) => {
-                resolve(object);
-            });
-        });
-    }
-
     public async init(): Promise<void> {
         this.mesh = await this.load();
         this.mesh.setRotationFromEuler(MESH_ROTATION);
@@ -126,6 +119,15 @@ export class Car extends Object3D {
         this.mesh.rotateY(omega);
     }
 
+    private async load(): Promise<Object3D> {
+        return new Promise<Object3D>((resolve, reject) => {
+            const loader: ObjectLoader = new ObjectLoader();
+            loader.load("../../assets/camero/camero-2010-low-poly.json", (object) => {
+                resolve(object);
+            });
+        });
+    }
+
     private getWeightDistribution(): number {
         const acceleration: number = this.getAcceleration().length();
         const distribution: number = MASS * 0.5 + (1 / WHEELBASE) * MASS * acceleration;
@@ -133,7 +135,7 @@ export class Car extends Object3D {
         return Math.min(Math.max(0, distribution), 1);
     }
 
-    public getTractionForce(): number {
+    private getTractionForce(): number {
         const force: Vector3 = this.direction.clone().multiplyScalar(this.getEngineForce());
         const slipPeak: number = Math.min(SLIP_CONSTANT * this.getSlipRatio(), 6000);
         const maximumForce: number = slipPeak * this.weightRear;
@@ -141,7 +143,7 @@ export class Car extends Object3D {
         return maximumForce > force.length() ? maximumForce : force.length();
     }
 
-    public getSlipRatio(): number {
+    private getSlipRatio(): number {
         return (this.rearWheel.angularVelocity * this.rearWheel.radius - this.direction.x) / Math.abs(this.direction.x);
     }
 
@@ -149,35 +151,35 @@ export class Car extends Object3D {
         return this.getTotalTorque() / (this.rearWheel.inertia * 2);
     }
 
-    public getBrakeForce(): Vector3 {
+    private getBrakeForce(): Vector3 {
         return this.direction.multiplyScalar(this.rearWheel.frictionCoefficient * MASS * GRAVITY);
     }
 
-    public getBrakeTorque(): number {
+    private getBrakeTorque(): number {
         return this.getBrakeForce().length() * this.rearWheel.radius;
     }
 
-    public getTractionTorque(): number {
+    private getTractionTorque(): number {
         return this.getTractionForce() * this.rearWheel.radius;
     }
 
-    public getTotalTorque(): number {
+    private getTotalTorque(): number {
         return this.engine.getDriveTorque() + this.getTractionTorque() * 2 + this.getBrakeTorque();
     }
 
-    public getEngineForce(): number {
+    private getEngineForce(): number {
         return this.engine.getDriveTorque() / this.rearWheel.radius;
     }
 
-    public getDragForce(): Vector3 {
+    private getDragForce(): Vector3 {
         return this.speed.clone().multiplyScalar(DRAG_CONSTANT * this.speed.length());
     }
 
-    public getRollingResistance(): Vector3 {
+    private getRollingResistance(): Vector3 {
         return this.speed.clone().multiplyScalar(ROLLING_RESISTANCE);
     }
 
-    public getLongitudinalForce(): Vector3 {
+    private getLongitudinalForce(): Vector3 {
         const resultingForce: Vector3 = new Vector3();
 
         const tractionForce: number = this.getTractionForce();
@@ -195,15 +197,15 @@ export class Car extends Object3D {
         return resultingForce;
     }
 
-    public getAcceleration(): Vector3 {
+    private getAcceleration(): Vector3 {
         return this.getLongitudinalForce().divideScalar(MASS);
     }
 
-    public getDeltaSpeed(deltaTime: number): Vector3 {
+    private getDeltaSpeed(deltaTime: number): Vector3 {
         return this.getAcceleration().multiplyScalar(deltaTime);
     }
 
-    public getDeltaPosition(deltaTime: number): Vector3 {
+    private getDeltaPosition(deltaTime: number): Vector3 {
         return this.speed.clone().multiplyScalar(deltaTime);
     }
 }
