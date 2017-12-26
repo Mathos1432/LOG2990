@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "tsc && concurrently --kill-others \"tsc -w \" \"nodemon out/server/app/www.js\" ",
-    "lint": "tslint --project tsconfig.json \"./app/**/*.ts\"",
+    "lint": "tslint --project tsconfig.json \"./app/**/*.ts\" --format stylish",
     "test": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
     "test-once": "tsc && karma start karma.conf.js --single-run || npm run-script coverage",
     "coverage": "remap-istanbul -i coverage/coverage-final.json -o coverage -t html",
@@ -56,6 +56,7 @@
     "rimraf": "^2.5.4",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^3.2.3",
+    "tslint-microsoft-contrib": "^5.0.1",
     "typescript": "~2.4.2"
   }
 }

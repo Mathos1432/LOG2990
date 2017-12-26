@@ -1,6 +1,7 @@
 {
   "rulesDirectory":[
-    "node_modules/tslint-eslint-rules/dist/rules"
+    "node_modules/tslint-eslint-rules/dist/rules",
+    "node_modules/tslint-microsoft-contrib"
   ],
   "rules": {
     "arrow-return-shorthand": true,
@@ -63,7 +64,8 @@
     "no-eval": true,
     "no-inferrable-types": [
       true,
-      "ignore-params"
+      "ignore-params",
+      "ignore-properties"
     ],
     "no-misused-new": true,
     "no-non-null-assertion": true,
@@ -103,6 +105,13 @@
         "parameter": "nospace",
         "property-declaration": "nospace",
         "variable-declaration": "nospace"
+      },
+      {
+        "call-signature": "onespace",
+        "index-signature": "onespace",
+        "parameter": "onespace",
+        "property-declaration": "onespace",
+        "variable-declaration": "onespace"
       }
     ],
     "typeof-compare": true,
@@ -122,6 +131,8 @@
     ],
     
     // rules added by Dylan
+
+    //tslint native rules
     "no-sparse-arrays": true,
     "no-irregular-whitespace": true,
     "cyclomatic-complexity": [ true, 20],
@@ -153,6 +164,29 @@
     "no-return-await": true,
     "no-this-assignment": [true, {"allowed-names": ["^self$"], "allow-destructuring": false}],
     "prefer-conditional-expression": [true, "check-else-if"],
-    "switch-default": true
+    "switch-default": true,
+    "typedef": [
+      true, 
+      "call-signature", 
+      "parameter", 
+      "member-variable-declaration",
+      "arrow-parameter",
+      "property-declaration",
+      "variable-declaration"
+    ],
+
+    //tslint-microsoft-contrib
+    "max-func-body-length" : [
+      true, 
+      30, 
+      {
+        "ignore-parameters-to-function-regex": "describe",
+        "ignore-comments": true 
+      }
+    ],
+    "no-constant-condition" : true,
+    "no-suspicious-comment" : true,
+    "no-unnecessary-local-variable" : true,
+    "no-useless-files" : true
   }
 }
