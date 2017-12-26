@@ -6,7 +6,6 @@ import { Car } from "./car";
 const FAR_CLIPPING_PLANE = 1000;
 const NEAR_CLIPPING_PLANE = 1;
 const FIELD_OF_VIEW = 70;
-const CAMERA_Z = 800;
 
 const ACCELERATE_KEYCODE = 87;  // w
 const LEFT_KEYCODE = 65;        // a
@@ -60,8 +59,9 @@ export class RenderService {
         );
 
         await this.car.init();
-        this.camera.position.set(0, 10, 0);
+        this.camera.position.set(0, 25, 0);
         this.camera.lookAt(this.car.mesh.position);
+        this.camera.position.set(-30, 25, 0);
         this.scene.add(this.car.mesh);
         this.scene.add(new AmbientLight(0xffffff, 0.5));
     }

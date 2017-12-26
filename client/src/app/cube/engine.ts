@@ -12,8 +12,9 @@ const GEAR_RATIOS = [
 const DRIVE_RATIO = 3.27;
 
 const DOWNSHIFT_RPM = 1000;
-const MIN_RPM = 500;
+const MIN_RPM = 800;
 const SHIFT_RPM = 5000;
+const TRANSMISSION_EFFICIENCY = 1;
 
 export class Engine {
     private currentGear: number;
@@ -45,13 +46,13 @@ export class Engine {
         return rpm;
     }
 
-    public getWheelTorque() {
-        const wheelTorque = this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear];
+    public getDriveTorque() {
+        const wheelTorque = this.getTorque() * DRIVE_RATIO * GEAR_RATIOS[this.currentGear] * TRANSMISSION_EFFICIENCY;
         return wheelTorque;
     }
 
     private getTorque() {
-        let torque: number;
+        let torque = 295;
         const maxTorque = 295;
         if (this.RPM <= 1500) {
             torque = 100 + this.RPM / 20;
