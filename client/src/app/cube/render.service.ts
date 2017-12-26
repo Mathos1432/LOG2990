@@ -61,7 +61,7 @@ export class RenderService {
         await this.car.init();
         this.camera.position.set(0, 25, 0);
         this.camera.lookAt(this.car.mesh.position);
-        this.camera.position.set(-30, 25, 0);
+        this.camera.position.set(0, 25, 0);
         this.scene.add(this.car.mesh);
         this.scene.add(new AmbientLight(0xffffff, 0.5));
     }
