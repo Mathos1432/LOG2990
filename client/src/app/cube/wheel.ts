@@ -1,5 +1,3 @@
-import { Vector3 } from "three";
-
 const WHEEL_RADIUS: number = 0.3505; // 245/50R18
 const WHEEL_MASS: number = 15;
 const TIRE_FRICTION_COEFFICIENT: number = 1;
@@ -16,6 +14,7 @@ export class Wheel {
     }
 
     public get inertia(): number {
+        // tslint:disable-next-line:no-magic-numbers
         return this._mass * this._radius * this._radius / 2;
     }
 
@@ -34,9 +33,5 @@ export class Wheel {
 
     public update(speed: number): void {
         this._angularVelocity = speed / this.radius;
-    }
-
-    public getSlipRatio(speed: Vector3): number {
-        return (this.angularVelocity * this.radius - speed.x) / Math.abs(speed.x);
     }
 }

@@ -51,7 +51,7 @@ export class Engine {
         return this.getTorque() * this.driveRatio * this.gearRatios[this._currentGear] * this.transmissionEfficiency;
     }
 
-    private handleTransmission(speed: Vector3, wheelRadius: number) {
+    private handleTransmission(speed: Vector3, wheelRadius: number): void {
         if (this._rpm > this.shiftRPM && this._currentGear < this.gearRatios.length - 1) {
             this._currentGear++;
             this._rpm = this.getRPM(speed, wheelRadius);
@@ -72,14 +72,14 @@ export class Engine {
 
     private getTorque(): number {
         // Polynomial function to approximage a torque curve from the rpm.
-        // tslint:disable-next-line: no-magic-numbers
-        const torque = -0.0000000000000000001 * Math.pow(this._rpm, 6)
-            + 0.000000000000003 * Math.pow(this._rpm, 5)
-            - 0.00000000003 * Math.pow(this._rpm, 4)
-            + 0.0000002 * Math.pow(this.rpm, 3)
-            - 0.0006 * Math.pow(this._rpm, 2)
-            + 0.9905 * this._rpm
+        /* tslint:disable: no-magic-numbers */
+        return -Math.pow(this._rpm, 6) * 0.0000000000000000001
+            + Math.pow(this._rpm, 5) * 0.000000000000003
+            - Math.pow(this._rpm, 4) * 0.00000000003
+            + Math.pow(this.rpm, 3) * 0.0000002
+            - Math.pow(this._rpm, 2) * 0.0006
+            + this._rpm * 0.9905
             - 371.88;
-        return torque;
+        /* tslint:enable: no-magic-numbers */
     }
 }

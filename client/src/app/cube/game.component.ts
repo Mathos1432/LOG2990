@@ -32,7 +32,10 @@ export class GameComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        this.renderService.initialize(this.containerRef.nativeElement);
+        this.renderService
+            .initialize(this.containerRef.nativeElement)
+            .then(/* do nothing */)
+            .catch((err) => console.error(err));
     }
 
     public get car(): Car {

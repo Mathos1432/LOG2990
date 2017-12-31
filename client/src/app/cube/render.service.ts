@@ -12,6 +12,10 @@ const LEFT_KEYCODE: number = 65;        // a
 const BRAKE_KEYCODE: number = 83;       // s
 const RIGHT_KEYCODE: number = 68;       // d
 
+const INITIAL_CAMERA_POSITION_Y: number = 25;
+const WHITE: number = 0xFFFFFF;
+const AMBIENT_LIGHT_OPACITY: number = 0.5;
+
 @Injectable()
 export class RenderService {
     private camera: PerspectiveCamera;
@@ -63,11 +67,10 @@ export class RenderService {
         );
 
         await this._car.init();
-        this.camera.position.set(0, 25, 0);
-        this.camera.lookAt(this._car.mesh.position);
-        this.camera.position.set(0, 25, 0);
-        this.scene.add(this._car.mesh);
-        this.scene.add(new AmbientLight(0xFFFFFF, 0.5));
+        this.camera.position.set(0, INITIAL_CAMERA_POSITION_Y, 0);
+        this.camera.lookAt(this._car.position);
+        this.scene.add(this._car);
+        this.scene.add(new AmbientLight(WHITE, AMBIENT_LIGHT_OPACITY));
     }
 
     private getAspectRatio(): number {
@@ -96,7 +99,6 @@ export class RenderService {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
-
 
     // TODO: Create an event handler service.
     public handleKeyDown(event: KeyboardEvent): void {
