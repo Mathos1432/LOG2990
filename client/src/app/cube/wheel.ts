@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 
-const WHEEL_RADIUS: number = 0.45;      // 18 inches
-const WHEEL_MASS: number = 10;          // 10 kg
+const WHEEL_RADIUS: number = 0.3505; // 245/50R18
+const WHEEL_MASS: number = 15;
 const TIRE_FRICTION_COEFFICIENT: number = 1;
 
 export class Wheel {

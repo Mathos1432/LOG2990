@@ -1,31 +1,28 @@
 import {
     Vector3,
-    BoxGeometry,
-    Mesh,
-    MeshBasicMaterial,
-    FaceColors,
     Matrix4,
     Object3D,
     ObjectLoader,
     Euler,
-    Quaternion,
-    Matrix3
+    Quaternion
 } from "three";
 import { Engine } from "./engine";
-import { DEG_TO_RAD, MS_TO_SECONDS, GRAVITY } from "../constants";
-import { directiveDef } from "@angular/core/src/view/provider";
-import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from "@angular/platform-browser-dynamic/src/platform_providers";
-import { concat } from "rxjs/operators/concat";
+import { MS_TO_SECONDS, GRAVITY, PI_OVER_2 } from "../constants";
 import { Wheel } from "./wheel";
 
-const DEFAULT_DRAG_COEFFICIENT: number = -0.6;
-const DEFAULT_ROLLING_RESISTANCE: number = 30 * DEFAULT_DRAG_COEFFICIENT;
+const DEFAULT_DRAG_COEFFICIENT: number = -0.35;
+const ROLLING_TO_DRAG_RATIO: number = 30; // TODO: find a better name
+const DEFAULT_ROLLING_RESISTANCE: number = ROLLING_TO_DRAG_RATIO * DEFAULT_DRAG_COEFFICIENT;
 const DEFAULT_MASS: number = 1515;
 const DEFAULT_WHEELBASE: number = 2.78;
 const SLIP_CONSTANT: number = 300;
-const MAXIMUM_STEERING_ANGLE: number = Math.PI / 16;
-const INITIAL_MODEL_ROTATION: Euler = new Euler(0, Math.PI / 2, 0);
-
+const MAXIMUM_STEERING_ANGLE: number = 0.2;
+const INITIAL_MODEL_ROTATION: Euler = new Euler(0, PI_OVER_2, 0);
+const CAR_DIRECTION: Vector3 = new Vector3(0, 0, -1); // TODO: find a better name
+const INITIAL_WEIGHT_DISTRIBUTION: number = 0.5;
+const MAXIMUM_SLIP: number = 5000;
+const MINIMUM_SPEED: number = 0.01;
+const NUMBER_OF_REAR_WHEELS: number = 2;
 
 export class Car extends Object3D {
     public isAcceleratorPressed: boolean;
@@ -46,7 +43,7 @@ export class Car extends Object3D {
 
     private get direction(): Vector3 {
         const rotationMatrix: Matrix4 = new Matrix4();
-        const carDirection: Vector3 = new Vector3(0, 0, -1);
+        const carDirection: Vector3 = CAR_DIRECTION.clone();
 
         rotationMatrix.extractRotation(this.mesh.matrix);
         carDirection.applyMatrix4(rotationMatrix);
@@ -62,6 +59,10 @@ export class Car extends Object3D {
         return this.engine.currentGear;
     }
 
+    public get rpm(): number {
+        return this.engine.rpm;
+    }
+
     public constructor(
         engine: Engine = new Engine(),
         rearWheel: Wheel = new Wheel(),
@@ -75,13 +76,13 @@ export class Car extends Object3D {
         this.rearWheel = rearWheel;
         this.wheelbase = wheelbase;
         this.mass = mass;
-        this.dragCoefficient = this.dragCoefficient;
+        this.dragCoefficient = dragCoefficient;
         this.rollingResistanceCoefficient = rollingResistanceCoefficient;
 
         this.isBraking = false;
         this.modelLoaded = false;
         this.steeringWheelDirection = 0;
-        this.weightRear = 0.5;
+        this.weightRear = INITIAL_WEIGHT_DISTRIBUTION;
         this._speed = new Vector3(0, 0, 0);
     }
 
@@ -119,7 +120,6 @@ export class Car extends Object3D {
         rotationMatrix.extractRotation(this.mesh.matrix);
         const rotationQuaternion: Quaternion = new Quaternion();
         rotationQuaternion.setFromRotationMatrix(rotationMatrix);
-        const angle: Euler = this.mesh.rotation;
         this._speed.applyMatrix4(rotationMatrix);
 
         // Physics calculations
@@ -139,7 +139,7 @@ export class Car extends Object3D {
         this.engine.update(this._speed, this.rearWheel.radius);
         this.weightRear = this.getWeightDistribution();
         this._speed.add(this.getDeltaSpeed(deltaTime));
-        this._speed.setLength(this._speed.length() <= 0.05 ? 0 : this._speed.length());
+        this._speed.setLength(this._speed.length() <= MINIMUM_SPEED ? 0 : this._speed.length());
         this.mesh.position.add(this.getDeltaPosition(deltaTime));
         this.rearWheel.update(this._speed.length());
     }
@@ -157,24 +157,21 @@ export class Car extends Object3D {
 
     private getWeightDistribution(): number {
         const acceleration: number = this.getAcceleration().length();
-        const distribution: number = this.mass * 0.5 + (1 / this.wheelbase) * this.mass * acceleration;
+        // tslint:disable-next-line:no-magic-numbers
+        const distribution: number = this.mass + (1 / this.wheelbase) * this.mass * acceleration / 2;
 
         return Math.min(Math.max(0, distribution), 1);
     }
 
     private getTractionForce(): number {
         const force: Vector3 = this.direction.clone().multiplyScalar(this.getEngineForce());
-        const slipPeak: number = Math.min(SLIP_CONSTANT * this.getSlipRatio(), 6000);
-        const maximumForce: number = slipPeak * this.weightRear;
-        return maximumForce > force.length() ? maximumForce : force.length();
-    }
-
-    private getSlipRatio(): number {
-        return this.rearWheel.getSlipRatio(this._speed);
+        const maxForce = this.rearWheel.frictionCoefficient * this.mass * GRAVITY / 2;
+        console.log(-maxForce * this.weightRear);
+        return -maxForce * this.weightRear;
     }
 
     private getAngularAcceleration(): number {
-        return this.getTotalTorque() / (this.rearWheel.inertia * 2);
+        return this.getTotalTorque() / (this.rearWheel.inertia * NUMBER_OF_REAR_WHEELS);
     }
 
     private getBrakeForce(): Vector3 {
@@ -190,7 +187,7 @@ export class Car extends Object3D {
     }
 
     private getTotalTorque(): number {
-        return this.engine.getDriveTorque() + this.getTractionTorque() * 2 + this.getBrakeTorque();
+        return this.getTractionTorque() * NUMBER_OF_REAR_WHEELS + this.getBrakeTorque();
     }
 
     private getEngineForce(): number {
@@ -198,11 +195,17 @@ export class Car extends Object3D {
     }
 
     private getDragForce(): Vector3 {
-        return this.speed.multiplyScalar(this.dragCoefficient * this.speed.length());
+        const carSurface = 3;
+        const airDensity = 1.2;
+        const resistance = this.direction;
+        resistance.multiplyScalar(airDensity * carSurface * this.dragCoefficient * this.speed.length() * this.speed.length());
+        return resistance;
     }
 
     private getRollingResistance(): Vector3 {
-        return this.speed.multiplyScalar(this.rollingResistanceCoefficient);
+        const tirePressure = 1;
+        const rollingCoefficient = 0.005 + (1 / tirePressure) * (0.01 + 0.0095 * Math.pow(this.speed.length() * 3.6 / 100, 2));
+        return this.direction.multiplyScalar(rollingCoefficient * this.mass * GRAVITY);
     }
 
     private getLongitudinalForce(): Vector3 {
@@ -211,15 +214,17 @@ export class Car extends Object3D {
         }
         const resultingForce: Vector3 = new Vector3();
 
-        const tractionForce: number = this.getTractionForce();
         const dragForce: Vector3 = this.getDragForce();
         const rollingResistance: Vector3 = this.getRollingResistance();
-        const brakeForce: Vector3 = this.getBrakeForce();
         resultingForce.add(dragForce).add(rollingResistance);
 
         if (this.isAcceleratorPressed) {
-            resultingForce.add(this.direction.multiplyScalar(tractionForce));
-        } else if (this.isBraking && this.speed.normalize().dot(this.direction) > 0.2) {
+            const tractionForce: number = this.getTractionForce();
+            const accelerationForce = this.direction;
+            accelerationForce.multiplyScalar(tractionForce);
+            resultingForce.add(accelerationForce);
+        } else if (this.isBraking && this.speed.normalize().dot(this.direction) > 0.2) { // TODO: create a constant for 0.2?
+            const brakeForce: Vector3 = this.getBrakeForce();
             resultingForce.add(brakeForce);
         }
 
