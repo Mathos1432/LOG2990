@@ -3,9 +3,9 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 
 import { AppComponent } from "./app.component";
-import { GameComponent } from "./cube/game.component";
+import { GameComponent } from "./game-component/game.component";
 
-import { RenderService } from "./cube/render.service";
+import { RenderService } from "./render-service/render.service";
 import { BasicService } from "./basic.service";
 
 @NgModule({

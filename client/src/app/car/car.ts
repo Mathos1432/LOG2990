@@ -4,10 +4,9 @@ import { MS_TO_SECONDS, GRAVITY, PI_OVER_2 } from "../constants";
 import { Wheel } from "./wheel";
 
 const DEFAULT_DRAG_COEFFICIENT: number = -0.35;
-const ROLLING_TO_DRAG_RATIO: number = 30; // TODO: find a better name
 const DEFAULT_MASS: number = 1515;
 const DEFAULT_WHEELBASE: number = 2.78;
-const MAXIMUM_STEERING_ANGLE: number = 0.2;
+const MAXIMUM_STEERING_ANGLE: number = 0.25;
 const INITIAL_MODEL_ROTATION: Euler = new Euler(0, PI_OVER_2, 0);
 const CAR_DIRECTION: Vector3 = new Vector3(0, 0, -1); // TODO: find a better name
 const INITIAL_WEIGHT_DISTRIBUTION: number = 0.5;

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import Stats = require("stats.js");
 import { PerspectiveCamera, WebGLRenderer, Scene, AmbientLight } from "three";
-import { Car } from "./car";
+import { Car } from "../car/car";
 
 const FAR_CLIPPING_PLANE: number = 1000;
 const NEAR_CLIPPING_PLANE: number = 1;
