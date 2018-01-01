@@ -1,6 +1,6 @@
 import { Vector3, Matrix4, Object3D, ObjectLoader, Euler, Quaternion } from "three";
 import { Engine } from "./engine";
-import { MS_TO_SECONDS, GRAVITY, PI_OVER_2 } from "../constants";
+import { MS_TO_SECONDS, GRAVITY, PI_OVER_2, RAD_TO_DEG } from "../constants";
 import { Wheel } from "./wheel";
 
 const DEFAULT_DRAG_COEFFICIENT: number = -0.35;
@@ -40,6 +40,10 @@ export class Car extends Object3D {
 
     public get rpm(): number {
         return this.engine.rpm;
+    }
+
+    public get angle(): number {
+        return this.mesh.rotation.y * RAD_TO_DEG;
     }
 
     private get direction(): Vector3 {
@@ -134,7 +138,7 @@ export class Car extends Object3D {
 
     private physicsUpdate(deltaTime: number): void {
         this.rearWheel.angularVelocity += this.getAngularAcceleration() * deltaTime;
-        this.engine.update(this._speed, this.rearWheel.radius);
+        this.engine.update(this._speed.length(), this.rearWheel.radius);
         this.weightRear = this.getWeightDistribution();
         this._speed.add(this.getDeltaSpeed(deltaTime));
         this._speed.setLength(this._speed.length() <= MINIMUM_SPEED ? 0 : this._speed.length());
@@ -144,8 +148,10 @@ export class Car extends Object3D {
 
     private getWeightDistribution(): number {
         const acceleration: number = this.getAcceleration().length();
-        // tslint:disable-next-line:no-magic-numbers
-        const distribution: number = this.mass + (1 / this.wheelbase) * this.mass * acceleration / 2;
+        /* tslint:disable: no-magic-numbers */
+        const distribution: number =
+            this.mass + (1 / this.wheelbase) * this.mass * acceleration / 2;
+        /* tslint: enable: no-magic-numbers */
 
         return Math.min(Math.max(0, distribution), 1);
     }
@@ -194,7 +200,8 @@ export class Car extends Object3D {
 
     private getTractionForce(): number {
         const force: number = this.getEngineForce();
-        const maxForce: number = this.rearWheel.frictionCoefficient * this.mass * GRAVITY * this.weightRear * NUMBER_REAR_WHEELS / NUMBER_WHEELS;
+        const maxForce: number =
+            this.rearWheel.frictionCoefficient * this.mass * GRAVITY * this.weightRear * NUMBER_REAR_WHEELS / NUMBER_WHEELS;
 
         return -Math.min(force, maxForce);
     }
