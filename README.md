@@ -19,6 +19,7 @@ Run `ng test --watch=false --code-coverage` to generate a code coverage report f
 ## Running TSLint
 
 Run `ng lint --type-check` to run TSLint on the client side.
+
 Run `npm run lint` to run TSLint on the server side.
 
 ## Further help
