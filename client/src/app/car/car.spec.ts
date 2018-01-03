@@ -1,6 +1,7 @@
 import { Car, DEFAULT_WHEELBASE, DEFAULT_MASS, DEFAULT_DRAG_COEFFICIENT } from "./car";
 import { Engine } from "./engine";
 import { Wheel } from "./wheel";
+import { Vector3 } from "three";
 
 /* tslint:disable: no-magic-numbers */
 class MockEngine extends Engine {
@@ -36,6 +37,15 @@ describe("Car", () => {
     });
 
     it("should decelerate when brake is pressed", () => {
+        // Remove rolling resistance and drag force so the only force slowing down the car is the brakes.
+        car["getRollingResistance"] = () => {
+            return new Vector3(0, 0, 0);
+        }
+
+        car["getDragForce"] = () => {
+            return new Vector3(0, 0, 0);
+        }
+
         car.isAcceleratorPressed = true;
         car.update(40);
         car.isAcceleratorPressed = false;
@@ -48,7 +58,7 @@ describe("Car", () => {
 
     it("should decelerate without brakes", () => {
         const initialSpeed: number = car.speed.length();
-        // TODO: remove air drag and rolling resistance for this test.
+
         car.releaseBrakes();
         car.update(20);
         expect(car.speed.length()).toBeLessThan(initialSpeed);
@@ -88,7 +98,7 @@ describe("Car", () => {
 
     it("should use default Wheel parameter when none is provided", () => {
         car = new Car(new MockEngine(), undefined);
-        expect(car["rearWheel"]).toBeDefined()  ;
+        expect(car["rearWheel"]).toBeDefined();
     });
 
     it("should check validity of wheelbase parameter", () => {
