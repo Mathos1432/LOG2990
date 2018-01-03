@@ -68,4 +68,15 @@ describe("Car", () => {
         car.update(20);
         expect(car.angle).toBeLessThan(initialAngle);
     });
+
+    it("should not turn when steering keys are released", () => {
+        car.isAcceleratorPressed = true;
+        car.steerRight();
+        car.update(20);
+
+        const initialAngle: number = car.angle;
+        car.releaseSteering();
+        car.update(20);
+        expect(car.angle).toBe(initialAngle);
+    });
 });

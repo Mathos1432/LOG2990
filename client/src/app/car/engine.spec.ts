@@ -1,6 +1,6 @@
 import {
     Engine, DEFAULT_GEAR_RATIOS, DEFAULT_DRIVE_RATIO, DEFAULT_DOWNSHIFT_RPM,
-    DEFAULT_MINIMUM_RPM, DEFAULT_SHIFT_RPM, DEFAULT_MAX_RPM
+    DEFAULT_MINIMUM_RPM, DEFAULT_SHIFT_RPM, DEFAULT_MAX_RPM, DEFAULT_TRANSMISSION_EFFICIENCY
 } from "./engine";
 
 /* tslint:disable: no-magic-numbers */
@@ -72,6 +72,15 @@ describe("Engine", () => {
         expect(engine["shiftRPM"]).toBe(DEFAULT_SHIFT_RPM);
     });
 
+    it("should use default transmissionEfficiency when value is invalid", () => {
+        engine = new Engine(
+            DEFAULT_GEAR_RATIOS, DEFAULT_DRIVE_RATIO, DEFAULT_DOWNSHIFT_RPM,
+            DEFAULT_DOWNSHIFT_RPM, DEFAULT_DOWNSHIFT_RPM, 0);
+
+        expect(engine).toBeDefined();
+        expect(engine["transmissionEfficiency"]).toBe(DEFAULT_TRANSMISSION_EFFICIENCY);
+    });
+
     it("should use default drive ration when invalid values are provided", () => {
         const gearRatios: number[] = DEFAULT_GEAR_RATIOS;
         engine = new Engine(gearRatios, -2);
@@ -117,5 +126,16 @@ describe("Engine", () => {
         speed = 0;
         engine.update(speed, 1);
         expect(engine.currentGear).toBe(0);
+    });
+
+    it("should not calculate rpm using a negative speed.", () => {
+        engine = new Engine();
+        engine.update(-10, 1);
+        expect(engine.rpm).toBe(engine["minimumRPM"]);
+    });
+
+    it("should throw an error when wheel radius is invalid.", () => {
+        engine = new Engine();
+        expect(() => { engine.update(10, 0) }).toThrowError();
     });
 });
