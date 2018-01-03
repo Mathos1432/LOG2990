@@ -136,6 +136,6 @@ describe("Engine", () => {
 
     it("should throw an error when wheel radius is invalid.", () => {
         engine = new Engine();
-        expect(() => { engine.update(10, 0) }).toThrowError();
+        expect(() => { engine.update(10, 0); }).toThrowError();
     });
 });
