@@ -1,7 +1,7 @@
 import { Vector3, Matrix4, Object3D, ObjectLoader, Euler, Quaternion } from "three";
 import { Engine } from "./engine";
 import { MS_TO_SECONDS, GRAVITY, PI_OVER_2, RAD_TO_DEG } from "../constants";
-import { Wheel } from "./wheel";
+import { Wheel, DEFAULT_WHEEL_MASS } from "./wheel";
 
 const DEFAULT_DRAG_COEFFICIENT: number = -0.35;
 const DEFAULT_MASS: number = 1515;
@@ -62,6 +62,26 @@ export class Car extends Object3D {
         mass: number = DEFAULT_MASS,
         dragCoefficient: number = DEFAULT_DRAG_COEFFICIENT) {
         super();
+
+        if (engine === undefined) {
+            engine = new Engine();
+        }
+
+        if (rearWheel === undefined) {
+            rearWheel = new Wheel();
+        }
+
+        if (wheelbase <= 0) {
+            wheelbase = DEFAULT_WHEELBASE;
+        }
+
+        if (mass <= 0) {
+            mass = DEFAULT_MASS;
+        }
+
+        if (dragCoefficient <= 0) {
+            dragCoefficient = DEFAULT_DRAG_COEFFICIENT;
+        }
 
         this.engine = engine;
         this.rearWheel = rearWheel;
