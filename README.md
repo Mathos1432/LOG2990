@@ -10,9 +10,11 @@ Pour créer de nouveaux composants, nous vous recommandons l'utilisation d'angul
 Il est aussi possible de générer des directives, pipes, services, guards, interfaces, enums, muodules, classes, avec cette commande `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
 ## Exécution des tests unitaires
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Exécuter `ng test` pour lancer les tests unitaires avec [Karma](https://karma-runner.github.io) sur le client.
 
-Run `ng test --watch=false --code-coverage` to generate a code coverage report for the unit tests via [Karma](https://karma-runner.github.io).
+Exécuter `ng test --watch=false --code-coverage` pour générer un rapport de code coverage avec [Karma](https://karma-runner.github.io) sur le client.
+
+Exécuter `npm test` pour lancer les tests unitaires avec [Mocha](https://mochajs.org/) sur le serveur.
 
 ## Exécution de TSLint
 Exécuter `npm run lint` pour lancer TSLint.
