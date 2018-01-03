@@ -26,7 +26,6 @@ export class Car extends Object3D {
     private _speed: Vector3;
     private isBraking: boolean;
     private mesh: Object3D;
-    private modelLoaded: boolean;
     private steeringWheelDirection: number;
     private weightRear: number;
 
@@ -71,7 +70,6 @@ export class Car extends Object3D {
         this.dragCoefficient = dragCoefficient;
 
         this.isBraking = false;
-        this.modelLoaded = false;
         this.steeringWheelDirection = 0;
         this.weightRear = INITIAL_WEIGHT_DISTRIBUTION;
         this._speed = new Vector3(0, 0, 0);
@@ -82,7 +80,6 @@ export class Car extends Object3D {
         return new Promise<Object3D>((resolve, reject) => {
             const loader: ObjectLoader = new ObjectLoader();
             loader.load("../../assets/camero/camero-2010-low-poly.json", (object) => {
-                this.modelLoaded = true;
                 resolve(object);
             });
         });
@@ -157,9 +154,6 @@ export class Car extends Object3D {
     }
 
     private getLongitudinalForce(): Vector3 {
-        if (!this.modelLoaded) {
-            return new Vector3(0, 0, 0);
-        }
         const resultingForce: Vector3 = new Vector3();
 
         if (this._speed.length() >= MINIMUM_SPEED) {
