@@ -156,8 +156,7 @@
         "use-pipe-transform-interface": true,
         "component-class-suffix": true,
         "directive-class-suffix": true,
-        // rules added by Dylan
-        //tslint native rules
+
         "no-sparse-arrays": true,
         "no-irregular-whitespace": true,
         "cyclomatic-complexity": [
@@ -228,7 +227,6 @@
             "property-declaration",
             "variable-declaration"
         ],
-        //tslint-microsoft-contrib
         "max-func-body-length": [
             true,
             30,
