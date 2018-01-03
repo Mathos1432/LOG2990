@@ -1,11 +1,11 @@
 import { Vector3, Matrix4, Object3D, ObjectLoader, Euler, Quaternion } from "three";
 import { Engine } from "./engine";
 import { MS_TO_SECONDS, GRAVITY, PI_OVER_2, RAD_TO_DEG } from "../constants";
-import { Wheel, DEFAULT_WHEEL_MASS } from "./wheel";
+import { Wheel } from "./wheel";
 
-const DEFAULT_DRAG_COEFFICIENT: number = -0.35;
-const DEFAULT_MASS: number = 1515;
-const DEFAULT_WHEELBASE: number = 2.78;
+export const DEFAULT_WHEELBASE: number = 2.78;
+export const DEFAULT_MASS: number = 1515;
+export const DEFAULT_DRAG_COEFFICIENT: number = 0.35;
 const MAXIMUM_STEERING_ANGLE: number = 0.25;
 const INITIAL_MODEL_ROTATION: Euler = new Euler(0, PI_OVER_2, 0);
 const CAR_DIRECTION: Vector3 = new Vector3(0, 0, -1); // TODO: find a better name
@@ -63,23 +63,18 @@ export class Car extends Object3D {
         dragCoefficient: number = DEFAULT_DRAG_COEFFICIENT) {
         super();
 
-        if (engine === undefined) {
-            engine = new Engine();
-        }
-
-        if (rearWheel === undefined) {
-            rearWheel = new Wheel();
-        }
-
         if (wheelbase <= 0) {
+            console.error("Wheelbase should be greater than 0.")
             wheelbase = DEFAULT_WHEELBASE;
         }
 
         if (mass <= 0) {
+            console.error("Mass should be greater than 0.")
             mass = DEFAULT_MASS;
         }
 
         if (dragCoefficient <= 0) {
+            console.error("Drag coefficient should be greater than 0.")
             dragCoefficient = DEFAULT_DRAG_COEFFICIENT;
         }
 
@@ -207,7 +202,7 @@ export class Car extends Object3D {
         const carSurface: number = 3;
         const airDensity: number = 1.2;
         const resistance: Vector3 = this.direction;
-        resistance.multiplyScalar(airDensity * carSurface * this.dragCoefficient * this.speed.length() * this.speed.length());
+        resistance.multiplyScalar(airDensity * carSurface * -this.dragCoefficient * this.speed.length() * this.speed.length());
 
         return resistance;
     }
