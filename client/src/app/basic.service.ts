@@ -5,7 +5,7 @@ import { Observable } from "rxjs/Observable";
 import { catchError } from "rxjs/operators";
 import { of } from "rxjs/observable/of";
 
-import { Message } from "../../../commun/communication/message";
+import { Message } from "../../../common/communication/message";
 
 @Injectable()
 export class BasicService {

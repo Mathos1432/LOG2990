@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import {Message} from "../../../commun/communication/message";
+import { Message } from "../../../common/communication/message";
 import "reflect-metadata";
 import { injectable, } from "inversify";
 
