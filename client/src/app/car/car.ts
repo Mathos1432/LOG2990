@@ -10,7 +10,7 @@ export const DEFAULT_DRAG_COEFFICIENT: number = 0.35;
 const MAXIMUM_STEERING_ANGLE: number = 0.25;
 const INITIAL_MODEL_ROTATION: Euler = new Euler(0, PI_OVER_2, 0);
 const INITIAL_WEIGHT_DISTRIBUTION: number = 0.5;
-const MINIMUM_SPEED: number = 0.08;
+const MINIMUM_SPEED: number = 0.05;
 const NUMBER_REAR_WHEELS: number = 2;
 const NUMBER_WHEELS: number = 4;
 
@@ -160,12 +160,12 @@ export class Car extends Object3D {
 
     private getWeightDistribution(): number {
         const acceleration: number = this.getAcceleration().length();
-        /* tslint:disable: no-magic-numbers */
+        /* tslint:disable:no-magic-numbers */
         const distribution: number =
             this.mass + (1 / this.wheelbase) * this.mass * acceleration / 2;
 
         return Math.min(Math.max(0.25, distribution), 0.75);
-        /* tslint: enable: no-magic-numbers */
+        /* tslint:enable:no-magic-numbers */
     }
 
     private getLongitudinalForce(): Vector3 {
@@ -192,6 +192,8 @@ export class Car extends Object3D {
 
     private getRollingResistance(): Vector3 {
         const tirePressure: number = 1;
+        // formula taken from: https://www.engineeringtoolbox.com/rolling-friction-resistance-d_1303.html
+
         // tslint:disable-next-line:no-magic-numbers
         const rollingCoefficient: number = (1 / tirePressure) * (Math.pow(this.speed.length() * 3.6 / 100, 2) * 0.0095 + 0.01) + 0.005;
 

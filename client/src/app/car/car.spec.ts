@@ -3,6 +3,8 @@ import { Engine } from "./engine";
 import { Wheel } from "./wheel";
 import { Vector3 } from "three";
 
+const MS_BETWEEN_FRAMES: number = 16.6667;
+
 /* tslint:disable: no-magic-numbers */
 class MockEngine extends Engine {
     public getDriveTorque(): number {
@@ -18,7 +20,7 @@ describe("Car", () => {
         await car.init();
 
         car.isAcceleratorPressed = true;
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
         car.isAcceleratorPressed = false;
         done();
     });
@@ -32,7 +34,7 @@ describe("Car", () => {
     it("should accelerate when accelerator is pressed", () => {
         const initialSpeed: number = car.speed.length();
         car.isAcceleratorPressed = true;
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
         expect(car.speed.length()).toBeGreaterThan(initialSpeed);
     });
 
@@ -47,12 +49,12 @@ describe("Car", () => {
         };
 
         car.isAcceleratorPressed = true;
-        car.update(40);
+        car.update(MS_BETWEEN_FRAMES);
         car.isAcceleratorPressed = false;
 
         const initialSpeed: number = car.speed.length();
         car.brake();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
         expect(car.speed.length()).toBeLessThan(initialSpeed);
     });
 
@@ -60,7 +62,7 @@ describe("Car", () => {
         const initialSpeed: number = car.speed.length();
 
         car.releaseBrakes();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
         expect(car.speed.length()).toBeLessThan(initialSpeed);
     });
 
@@ -68,7 +70,7 @@ describe("Car", () => {
         const initialAngle: number = car.angle;
         car.isAcceleratorPressed = true;
         car.steerLeft();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES * 2);
         expect(car.angle).toBeLessThan(initialAngle);
     });
 
@@ -76,18 +78,18 @@ describe("Car", () => {
         const initialAngle: number = car.angle;
         car.isAcceleratorPressed = true;
         car.steerRight();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES * 2);
         expect(car.angle).toBeLessThan(initialAngle);
     });
 
     it("should not turn when steering keys are released", () => {
         car.isAcceleratorPressed = true;
         car.steerRight();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
 
         const initialAngle: number = car.angle;
         car.releaseSteering();
-        car.update(20);
+        car.update(MS_BETWEEN_FRAMES);
         expect(car.angle).toBe(initialAngle);
     });
 
